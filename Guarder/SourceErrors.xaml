@@ -1,0 +1,36 @@
+﻿<Window x:Class="Guarder.SourceErrors"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+          Title="Grid:"  FontFamily="SimSun"  Height="600" Width="920">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5*"></RowDefinition>
+         
+        </Grid.RowDefinitions>
+        <ListView Name="lvErrors" FontSize="14" FontFamily="SimSun" Margin="0,0,0,0" Grid.RowSpan="2">
+            <ListView.View >
+                <GridView>
+                    <GridViewColumn Header="行" Width="30"  DisplayMemberBinding="{Binding Path=LineNumber}"></GridViewColumn>
+                    <GridViewColumn Header="当前条码" Width="130" DisplayMemberBinding="{Binding Path=Barcode }"></GridViewColumn>
+                    <GridViewColumn Header="期望条码" Width="130" DisplayMemberBinding="{Binding Path=ExpectedBarcode }"></GridViewColumn>
+                    <GridViewColumn Header="错误信息" Width="600" DisplayMemberBinding="{Binding Path=ErrMsg}"></GridViewColumn>
+                </GridView>
+                
+            </ListView.View>
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding Path=IsCorrect}" Value="False">
+                            <Setter Property="Foreground" Value="Red"  />
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </ListView.ItemContainerStyle>
+            
+        </ListView>
+  
+    </Grid>
+</Window>

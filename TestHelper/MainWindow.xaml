@@ -1,0 +1,10 @@
+﻿<Window x:Class="TestHelper.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="350" Width="493">
+    <Grid>
+        <ListBox HorizontalAlignment="Stretch" Margin="0,0,100,0" Name="lstFiles"/>
+        <Button Name="btnNext" Content="下一个" HorizontalAlignment="Right"  VerticalAlignment="Bottom" Width="75" Height="44" Click="btnNext_Click"/>
+
+    </Grid>
+</Window>
