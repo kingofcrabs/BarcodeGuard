@@ -423,13 +423,14 @@ namespace Guarder
             }
         }
 
-        private void UpdateCertianDstExpectedBarcode(string barcode,int rowIndex)
+        private void UpdateCertianDstExpectedBarcode(string barcode,int colIndex, int rowIndex)
         {
             int slices = packageInfo.dstSlices;
-           
+            int regionIndex = colIndex / packageInfo.srcSlices;
+
             for (int sliceIndex = 0; sliceIndex < slices; sliceIndex++)
             {
-                int dstGrid = GetDstStartGrid() + sliceIndex;
+                int dstGrid = GetDstStartGrid() + regionIndex * packageInfo.dstSlices + sliceIndex;
                 if (!eachGridBarcodes.ContainsKey(dstGrid))
                     continue;
                 if (eachGridBarcodes[dstGrid].Count <= sliceIndex)
@@ -732,7 +733,7 @@ namespace Guarder
                     , grid, e.RowIndex + 1);
                 if (isSourceGrid)
                 {
-                    UpdateCertianDstExpectedBarcode(actual, cell.RowIndex);
+                    UpdateCertianDstExpectedBarcode(actual,cell.ColumnIndex, cell.RowIndex);
                     //SaveBarcodeThisCell(actual,cell.RowIndex, eachGridBarcodes[grid]);
                 }
                 AddHintInfo(hint, Color.Orange);
