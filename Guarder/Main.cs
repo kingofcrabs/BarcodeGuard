@@ -615,18 +615,18 @@ namespace Guarder
                 return false;
             }
 
-            int regionIndex = (grid - GetSrcStartGrid()) / packageInfo.srcSlices;
-            int refGrid = GetSrcStartGrid() + regionIndex * packageInfo.srcSlices;
-            if (eachSrcGridRefBarcodes.ContainsKey(refGrid))
-            {
-                var tmpRef = eachSrcGridRefBarcodes[refGrid][rowIndex];
-                var refBarcodeWithoutSuffix = tmpRef.Remove(tmpRef.Length - 1);
-                string expectedBarcode = string.Format("{0}{1}", refBarcodeWithoutSuffix, expectedSuffix);
-                bool bok = expectedBarcode == barcodes[rowIndex];
-                if (!bok)
-                    errMsg = string.Format("Grid{0}中第{1}个条码希望是{2}，实际却是{3}", grid, rowIndex + 1, expectedBarcode, barcodes[rowIndex]);
-                return bok;
-            }
+            //int regionIndex = (grid - GetSrcStartGrid()) / packageInfo.srcSlices;
+            //int refGrid = GetSrcStartGrid() + regionIndex * packageInfo.srcSlices;
+            //if (eachSrcGridRefBarcodes.ContainsKey(refGrid))
+            //{
+            //    var tmpRef = eachSrcGridRefBarcodes[refGrid][rowIndex];
+            //    var refBarcodeWithoutSuffix = tmpRef.Remove(tmpRef.Length - 1);
+            //    string expectedBarcode = string.Format("{0}{1}", refBarcodeWithoutSuffix, expectedSuffix);
+            //    bool bok = expectedBarcode == barcodes[rowIndex];
+            //    if (!bok)
+            //        errMsg = string.Format("Grid{0}中第{1}个条码希望是{2}，实际却是{3}", grid, rowIndex + 1, expectedBarcode, barcodes[rowIndex]);
+            //    return bok;
+            //}
             return true;
         }
 
@@ -708,7 +708,35 @@ namespace Guarder
             return strs.Last();
         }
         #endregion
-
+        private void dataGridView_CurrentCellChanged(object sender, EventArgs e)
+        {
+            if (eachGridBarcodes == null
+                || eachGridBarcodes.Count == 0)
+                return;
+            var curCell = dataGridView.CurrentCell;
+            int grid = eachGridBarcodes.Keys.ElementAt(curCell.ColumnIndex);
+            bool isSourceGrid = IsSourceSample(grid);
+            string errMsg = "";
+            if (eachGridBarcodes[grid].Count == 0)
+                return;
+            bool bok = true;
+            try
+            {
+                bok = IsValidBarcode(grid, curCell.RowIndex, eachGridBarcodes[grid], ref errMsg, isSourceGrid);
+            }
+            catch(Exception ex)
+            {
+                return;
+            }
+            if (!bok)
+            {
+                dataGridView.BeginEdit(false);
+            }
+            else
+            {
+                dataGridView.EndEdit();
+            }
+        }
         private void dataGridView_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
             if (programModify)
@@ -720,11 +748,13 @@ namespace Guarder
             int grid = eachGridBarcodes.Keys.ElementAt(e.ColumnIndex);
             var cell = dataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex];
             string actual = cell.Value.ToString();
-            SaveBarcodeThisCell(actual, cell.RowIndex, eachGridBarcodes[grid]);
+            List<string> curColBarcodes = new List<string>(eachGridBarcodes[grid]);
+            SaveBarcodeThisCell(actual, cell.RowIndex, curColBarcodes);
+            //SaveBarcodeThisCell(actual, cell.RowIndex, eachGridBarcodes[grid]);
             bool bok = false;
             string errMsg = "";
             bool isSourceGrid = IsSourceSample(grid);
-            bok = IsValidBarcode(grid, e.RowIndex, eachGridBarcodes[grid], ref errMsg, isSourceGrid);
+            bok = IsValidBarcode(grid, e.RowIndex, curColBarcodes, ref errMsg, isSourceGrid);
             if(bok)
             {
                 cell.Style.BackColor = Color.Orange;
@@ -734,8 +764,8 @@ namespace Guarder
                 if (isSourceGrid)
                 {
                     UpdateCertianDstExpectedBarcode(actual,cell.ColumnIndex, cell.RowIndex);
-                    //SaveBarcodeThisCell(actual,cell.RowIndex, eachGridBarcodes[grid]);
                 }
+                SaveBarcodeThisCell(actual, cell.RowIndex, eachGridBarcodes[grid]);
                 AddHintInfo(hint, Color.Orange);
             }
             else
@@ -773,6 +803,8 @@ namespace Guarder
             richTextInfo.SelectionColor = color;
             richTextInfo.AppendText(hint+"\r\n");
         }
+
+      
     }
 
     class LayoutInfoBase

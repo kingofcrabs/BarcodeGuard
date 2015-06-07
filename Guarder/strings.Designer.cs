@@ -79,7 +79,7 @@ namespace Guarder {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 0.12.
+        ///   Looks up a localized string similar to 0.13.
         /// </summary>
         internal static string version {
             get {
