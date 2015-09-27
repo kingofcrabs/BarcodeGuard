@@ -102,8 +102,11 @@ namespace Guarder
 
         void Main_Load(object sender, EventArgs e)
         {
+            
+            
+            
             CreateNamedPipeServer();
-            dataGridView.Visible = false;
+            //dataGridView.Visible = false;
           
         }
 

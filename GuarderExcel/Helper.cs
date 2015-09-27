@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Office.Interop.Excel;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -47,6 +48,15 @@ namespace Guarder
             string s = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             return s + "\\";
         }
+
+        //public static void Convert2CSV()
+        //{
+        //    //Console.WriteLine("try to convert the excel to csv format.");
+        //    List<string> files = Directory.EnumerateFiles(GlobalVars.WorkingFolder, "*.xls").ToList();
+        //    SaveAsCSV(files);
+        //}
+
+        
 
 
     }
