@@ -121,9 +121,9 @@
     <value>ReadBarcodeNotifier</value>
   </data>
   <data name="PipeName" xml:space="preserve">
-    <value>BarcodeGuarder</value>
+    <value>AntiErrorExcel</value>
   </data>
   <data name="version" xml:space="preserve">
-    <value>0.13</value>
+    <value>0.01</value>
   </data>
 </root>

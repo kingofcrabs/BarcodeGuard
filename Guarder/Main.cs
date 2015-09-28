@@ -24,7 +24,7 @@ namespace Guarder
         bool programModify = false;
         List<int> srcGrids = new List<int>();
         Dictionary<int, List<string>> eachGridBarcodes = new Dictionary<int, List<string>>();
-        Dictionary<int, List<string>> eachSrcGridRefBarcodes = new Dictionary<int, List<string>>();
+        //Dictionary<int, List<string>> eachSrcGridRefBarcodes = new Dictionary<int, List<string>>();
         ErrorsInfo errorsInfo = new ErrorsInfo();
         string dummy = "***";
         public GuardForm(int sampleCnt, bool is2Transfer,int plasmaSlices, int productSlices)
@@ -375,8 +375,8 @@ namespace Guarder
             barcodes = barcodes.Take(results.Count).ToList();
             if (IsSourceSample(grid))
             {
-                if (!is2TransferTubes) //ref barcode only works with from transfer to dst
-                    eachSrcGridRefBarcodes[grid] = barcodes;
+                //if (!is2TransferTubes) //ref barcode only works with from transfer to dst
+                //    eachSrcGridRefBarcodes[grid] = barcodes;
                 SaveBarcodeThisGrid(grid,barcodes);
                 int indexInRegion = (grid - GetSrcStartGrid()) % packageInfo.srcSlices;
                 if (indexInRegion == 0) //first slice
@@ -529,7 +529,7 @@ namespace Guarder
             return bok;
         }
 
-        private bool IsValidSrcBarcode(int grid,int rowIndex, List<string> barcodes, ref string errMsg)
+        private bool IsValidSrcBarcode(int grid,int rowIndex, List<string> barcodes, ref string errMsg, bool isFromUI = false)
         {
             //B or P
             string BorP = is2TransferTubes ? "B" : "P";
@@ -542,6 +542,45 @@ namespace Guarder
                 expectedLen += 2;
             if (sCurrentBarcode.Contains('R') || sCurrentBarcode.Contains('D'))
                 expectedLen += 1;
+
+            int indexInRegion = (grid - GetSrcStartGrid()) % packageInfo.srcSlices;
+            if (indexInRegion != 0) //not first in region
+            {
+                if (eachGridBarcodes.ContainsKey(grid - indexInRegion))//compare to the first in the region
+                {
+                    string firstInRegionBarcode = eachGridBarcodes[grid - indexInRegion][rowIndex];
+                    firstInRegionBarcode = firstInRegionBarcode.Substring(0, firstInRegionBarcode.Length - 1);
+                    string removeLastCurrentBarcode = sCurrentBarcode.Substring(0, sCurrentBarcode.Length - 1);
+                    if (firstInRegionBarcode != removeLastCurrentBarcode)
+                    {
+                        errMsg = string.Format("Grid{0}中第{1}个条码:{2}与Grid{3}中的同行的条码不匹配！",
+                        grid,
+                        rowIndex + 1,
+                        sCurrentBarcode,
+                        grid - indexInRegion);
+                        return false;
+                    }
+                }
+            }
+
+            if(isFromUI) //check all barcodes
+            {
+                for(int i = 0;  i< barcodes.Count; i++)
+                {
+                    if (i == rowIndex)
+                        continue;
+                    if (barcodes[i] == sCurrentBarcode)
+                    {
+                        errMsg = string.Format("Grid{0}中第{1}个条码:{2}重复！",
+                            grid,
+                            rowIndex + 1, sCurrentBarcode);
+                        return false;
+                    }
+                }
+
+            }
+            
+
 
             List<string> aheadBarcodes = barcodes.Take(rowIndex).ToList();
             foreach(var pair in eachGridBarcodes)
@@ -591,7 +630,6 @@ namespace Guarder
                 return false;
             }
 
-            int indexInRegion = (grid - GetSrcStartGrid()) % packageInfo.srcSlices;
             char expectedSuffix = (char)('A' + indexInRegion);
             if(sCurrentBarcode.Contains('P'))
             {
@@ -722,7 +760,7 @@ namespace Guarder
             bool bok = true;
             try
             {
-                bok = IsValidBarcode(grid, curCell.RowIndex, eachGridBarcodes[grid], ref errMsg, isSourceGrid);
+                bok = IsValidBarcode(grid, curCell.RowIndex, eachGridBarcodes[grid], ref errMsg, isSourceGrid,true);
             }
             catch(Exception ex)
             {
@@ -754,7 +792,7 @@ namespace Guarder
             bool bok = false;
             string errMsg = "";
             bool isSourceGrid = IsSourceSample(grid);
-            bok = IsValidBarcode(grid, e.RowIndex, curColBarcodes, ref errMsg, isSourceGrid);
+            bok = IsValidBarcode(grid, e.RowIndex, curColBarcodes, ref errMsg, isSourceGrid,true);
             if(bok)
             {
                 cell.Style.BackColor = Color.Orange;
@@ -781,13 +819,13 @@ namespace Guarder
 
 
 
-        bool IsValidBarcode(int grid, int rowIndex, List<string>barcodes, ref string errMsg,bool isSourceGrid)
+        bool IsValidBarcode(int grid, int rowIndex, List<string>barcodes, ref string errMsg,bool isSourceGrid, bool isFromUI = false)
         {
             bool bok = false;
             string actual = barcodes[rowIndex];
  	        if (isSourceGrid)
             {
-                bok = IsValidSrcBarcode(grid, rowIndex, barcodes, ref errMsg);
+                bok = IsValidSrcBarcode(grid, rowIndex, barcodes, ref errMsg, isFromUI);
             }
             else
             {

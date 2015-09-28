@@ -17,11 +17,11 @@ namespace Guarder
     {
 
         List<ErrorInfo> errorsInfo = new List<ErrorInfo>();
-        string dummy = "***";
         int sampleCnt = 0;
         bool programModify = false;
         public GuardForm()
         {
+            InitializeComponent();
             this.Load += Main_Load;
             this.FormClosing += GuardForm_FormClosing;
             this.FormClosed += GuardForm_FormClosed;
@@ -102,12 +102,8 @@ namespace Guarder
 
         void Main_Load(object sender, EventArgs e)
         {
-            
-            
-            
             CreateNamedPipeServer();
-            //dataGridView.Visible = false;
-          
+            dataGridView.Visible = false;
         }
 
 
@@ -145,6 +141,7 @@ namespace Guarder
                 dataGridView.Rows.Add(strs.ToArray());
                 dataGridView.Rows[i].HeaderCell.Value = string.Format("行{0}", i + 1);
             }
+            dataGridView.Visible = true;
         }
 
         public void UpdateDataGridView(int gridID, List<string> barcode)
@@ -156,20 +153,11 @@ namespace Guarder
                 cell.Value = barcode[i];
                 System.Drawing.Color foreColor = System.Drawing.Color.Green;
                 string curBarcode = barcode[i];
-                if (curBarcode == "***")
-                {
-                    foreColor = System.Drawing.Color.Red;
-                }
-                else if (curBarcode == "$$$")
-                {
-                    foreColor = System.Drawing.Color.Orange;
-                }
+                bool bEqual = curBarcode == GlobalVars.Instance.eachGridExpectedBarcodes[gridID][i];
+                foreColor = bEqual ? System.Drawing.Color.DarkGreen : System.Drawing.Color.Red;
                 cell.Style.ForeColor = foreColor;
             }
         }
-
-
-
   
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -238,11 +226,12 @@ namespace Guarder
                 AddErrorInfo(errMsg);
                 Helper.WriteResult(false);
             }
-            //update ui
-            UpdateGridCells(grid, barcodes, results);
+         
 
             //check ok, if not ok, show concrete information.
             bool bok = CheckBarcodes(grid, results);
+            //update ui
+            UpdateGridCells(grid, barcodes, results);
             if(bok)
             {
                 Helper.CloseWaiter(strings.NotifierName);
@@ -250,6 +239,7 @@ namespace Guarder
             }
             else
                 ShowErrorDialog(grid);
+      
             Helper.WriteResult(bok);
         }
 
@@ -260,7 +250,7 @@ namespace Guarder
                 bool bok = IsValidBarcode(grid,i);
                 results.Add(bok);
             }
-            return results.Contains(false);
+            return !results.Contains(false);
         }
 
         private void ShowErrorDialog(int grid)
@@ -414,12 +404,23 @@ namespace Guarder
             }
             if( plateCnt <1 || plateCnt > 3)
             {
-                SetErrorInfo("样本数必须在1~3之间！");
+                SetErrorInfo("板数必须在1~3之间！");
                 return;
             }
+            EnableControls(false);
+            
+            Helper.CloseWaiter(GlobalVars.Instance.WaiterName);
             GlobalVars.Instance.PlateCnt = plateCnt;
-            var eachGridBarcodes = ExcelReader.ReadBarcodes();
-            InitDataGridView(eachGridBarcodes.Count);
+            GlobalVars.Instance.eachGridExpectedBarcodes = ExcelReader.ReadBarcodes();
+            int gridCnt = GlobalVars.Instance.eachGridExpectedBarcodes.Count;
+            Helper.WriteGridCnt(gridCnt);
+            InitDataGridView(gridCnt);
+        }
+
+        private void EnableControls(bool enableControls)
+        {
+            btnSet.Enabled = false;
+            txtPlateCount.Enabled = false;
         }
     }
 }

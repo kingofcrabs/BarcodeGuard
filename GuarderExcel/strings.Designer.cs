@@ -70,7 +70,7 @@ namespace Guarder {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to BarcodeGuarder.
+        ///   Looks up a localized string similar to AntiErrorExcel.
         /// </summary>
         internal static string PipeName {
             get {
@@ -79,7 +79,7 @@ namespace Guarder {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 0.13.
+        ///   Looks up a localized string similar to 0.01.
         /// </summary>
         internal static string version {
             get {

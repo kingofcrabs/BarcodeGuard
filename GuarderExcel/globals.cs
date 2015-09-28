@@ -11,10 +11,7 @@ namespace Guarder
         static GlobalVars instance = null;
         #region configures
         private int startGridID = int.Parse(ConfigurationManager.AppSettings["startGrid"]);
-
         #endregion
-
-        private int batchID = 0;
         public static GlobalVars Instance
         {
             get
@@ -23,6 +20,12 @@ namespace Guarder
                     instance = new GlobalVars();
                 return instance;
             }
+        }
+
+        public GlobalVars()
+        {
+            PlateBarcodes = new List<string>();
+            WaiterName = "FeedMe";
         }
 
         public Dictionary<int, List<string>> eachGridExpectedBarcodes = new Dictionary<int, List<string>>();
@@ -43,7 +46,7 @@ namespace Guarder
             }
         }
 
-
+        public List<string> PlateBarcodes { get; set; }
 
         public int PlateCnt { get; set; }
 
@@ -56,5 +59,7 @@ namespace Guarder
                 return GetSetting("excelFolder");
             }
         }
+
+        public string WaiterName { get; set; }
     }
 }

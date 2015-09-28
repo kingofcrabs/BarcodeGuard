@@ -135,6 +135,7 @@
             this.txtPlateCount.Name = "txtPlateCount";
             this.txtPlateCount.Size = new System.Drawing.Size(100, 20);
             this.txtPlateCount.TabIndex = 10;
+            this.txtPlateCount.Text = "1";
             // 
             // label4
             // 
