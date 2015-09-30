@@ -245,10 +245,16 @@ namespace Guarder
 
         private bool CheckBarcodes(int grid, List<bool> results)
         {
+            errorsInfo.Clear();
             for(int i = 0; i< GlobalVars.Instance.eachGridExpectedBarcodes[grid].Count ; i++)
             {
                 bool bok = IsValidBarcode(grid,i);
                 results.Add(bok);
+                
+                string actualBarcode = dataGridView.Rows[i].Cells[grid].Value.ToString() ;
+                string expectedBarcode = GlobalVars.Instance.eachGridExpectedBarcodes[grid][i];
+                string errMsg = bok ? "" : "条码不匹配！";
+                errorsInfo.Add(new ErrorInfo(i+1,actualBarcode,expectedBarcode,errMsg,bok));
             }
             return !results.Contains(false);
         }
