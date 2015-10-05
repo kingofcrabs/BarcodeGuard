@@ -54,10 +54,10 @@
             this.dataGridView.AllowUserToResizeColumns = false;
             this.dataGridView.AllowUserToResizeRows = false;
             this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView.Location = new System.Drawing.Point(10, 70);
+            this.dataGridView.Location = new System.Drawing.Point(10, 65);
             this.dataGridView.Name = "dataGridView";
             this.dataGridView.RowTemplate.Height = 23;
-            this.dataGridView.Size = new System.Drawing.Size(1143, 432);
+            this.dataGridView.Size = new System.Drawing.Size(1143, 399);
             this.dataGridView.TabIndex = 0;
             this.dataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellValueChanged);
             this.dataGridView.CurrentCellChanged += new System.EventHandler(this.dataGridView_CurrentCellChanged);
@@ -65,17 +65,17 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 54);
+            this.label1.Location = new System.Drawing.Point(10, 50);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(85, 13);
+            this.label1.Size = new System.Drawing.Size(89, 12);
             this.label1.TabIndex = 1;
             this.label1.Text = "扫描出的条码：";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("SimSun", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(10, 524);
+            this.label2.Font = new System.Drawing.Font("宋体", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.label2.Location = new System.Drawing.Point(10, 484);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(72, 13);
             this.label2.TabIndex = 2;
@@ -84,26 +84,26 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(738, 525);
+            this.label3.Location = new System.Drawing.Point(738, 485);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(37, 13);
+            this.label3.Size = new System.Drawing.Size(41, 12);
             this.label3.TabIndex = 4;
             this.label3.Text = "日志：";
             // 
             // txtLog
             // 
-            this.txtLog.Location = new System.Drawing.Point(740, 553);
+            this.txtLog.Location = new System.Drawing.Point(740, 510);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(410, 149);
+            this.txtLog.Size = new System.Drawing.Size(410, 138);
             this.txtLog.TabIndex = 5;
             // 
             // btnIgnore
             // 
-            this.btnIgnore.Location = new System.Drawing.Point(627, 553);
+            this.btnIgnore.Location = new System.Drawing.Point(627, 510);
             this.btnIgnore.Name = "btnIgnore";
-            this.btnIgnore.Size = new System.Drawing.Size(75, 25);
+            this.btnIgnore.Size = new System.Drawing.Size(75, 23);
             this.btnIgnore.TabIndex = 6;
             this.btnIgnore.Text = "忽略";
             this.btnIgnore.UseVisualStyleBackColor = true;
@@ -111,9 +111,9 @@
             // 
             // btnRetry
             // 
-            this.btnRetry.Location = new System.Drawing.Point(627, 584);
+            this.btnRetry.Location = new System.Drawing.Point(627, 539);
             this.btnRetry.Name = "btnRetry";
-            this.btnRetry.Size = new System.Drawing.Size(75, 25);
+            this.btnRetry.Size = new System.Drawing.Size(75, 23);
             this.btnRetry.TabIndex = 7;
             this.btnRetry.Text = "重试";
             this.btnRetry.UseVisualStyleBackColor = true;
@@ -121,70 +121,71 @@
             // 
             // richTextInfo
             // 
-            this.richTextInfo.Font = new System.Drawing.Font("SimSun", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.richTextInfo.Location = new System.Drawing.Point(10, 551);
+            this.richTextInfo.Font = new System.Drawing.Font("宋体", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.richTextInfo.HideSelection = false;
+            this.richTextInfo.Location = new System.Drawing.Point(10, 509);
             this.richTextInfo.Name = "richTextInfo";
             this.richTextInfo.ReadOnly = true;
-            this.richTextInfo.Size = new System.Drawing.Size(611, 150);
+            this.richTextInfo.Size = new System.Drawing.Size(611, 139);
             this.richTextInfo.TabIndex = 9;
             this.richTextInfo.Text = "";
             // 
             // txtPlateCount
             // 
-            this.txtPlateCount.Location = new System.Drawing.Point(58, 13);
+            this.txtPlateCount.Location = new System.Drawing.Point(58, 12);
             this.txtPlateCount.Name = "txtPlateCount";
-            this.txtPlateCount.Size = new System.Drawing.Size(100, 20);
+            this.txtPlateCount.Size = new System.Drawing.Size(100, 21);
             this.txtPlateCount.TabIndex = 10;
             this.txtPlateCount.Text = "1";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(10, 17);
+            this.label4.Location = new System.Drawing.Point(10, 16);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(37, 13);
+            this.label4.Size = new System.Drawing.Size(41, 12);
             this.label4.TabIndex = 11;
             this.label4.Text = "板数：";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(668, 17);
+            this.label6.Location = new System.Drawing.Point(668, 16);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(49, 13);
+            this.label6.Size = new System.Drawing.Size(53, 12);
             this.label6.TabIndex = 14;
             this.label6.Text = "版本号：";
             // 
             // lblVersion
             // 
             this.lblVersion.AutoSize = true;
-            this.lblVersion.Location = new System.Drawing.Point(727, 16);
+            this.lblVersion.Location = new System.Drawing.Point(727, 15);
             this.lblVersion.Name = "lblVersion";
-            this.lblVersion.Size = new System.Drawing.Size(0, 13);
+            this.lblVersion.Size = new System.Drawing.Size(0, 12);
             this.lblVersion.TabIndex = 15;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(402, 17);
+            this.label5.Location = new System.Drawing.Point(402, 16);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(49, 13);
+            this.label5.Size = new System.Drawing.Size(53, 12);
             this.label5.TabIndex = 16;
             this.label5.Text = "样品数：";
             // 
             // txtSampleCount
             // 
-            this.txtSampleCount.Location = new System.Drawing.Point(456, 13);
+            this.txtSampleCount.Location = new System.Drawing.Point(456, 12);
             this.txtSampleCount.Name = "txtSampleCount";
             this.txtSampleCount.ReadOnly = true;
-            this.txtSampleCount.Size = new System.Drawing.Size(100, 20);
+            this.txtSampleCount.Size = new System.Drawing.Size(100, 21);
             this.txtSampleCount.TabIndex = 17;
             // 
             // btnSet
             // 
-            this.btnSet.Location = new System.Drawing.Point(164, 12);
+            this.btnSet.Location = new System.Drawing.Point(164, 11);
             this.btnSet.Name = "btnSet";
-            this.btnSet.Size = new System.Drawing.Size(75, 23);
+            this.btnSet.Size = new System.Drawing.Size(75, 21);
             this.btnSet.TabIndex = 18;
             this.btnSet.Text = "设置";
             this.btnSet.UseVisualStyleBackColor = true;
@@ -192,9 +193,9 @@
             // 
             // GuardForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1162, 728);
+            this.ClientSize = new System.Drawing.Size(1162, 672);
             this.Controls.Add(this.btnSet);
             this.Controls.Add(this.txtSampleCount);
             this.Controls.Add(this.label5);

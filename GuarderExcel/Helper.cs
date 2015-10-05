@@ -33,21 +33,17 @@ namespace Guarder
         public static void WriteRetryOrIgnore(bool bRetry)
         {
             string retryOrIgnore = bRetry ? "Retry" : "Ignore";
-            string sFile = GetExeFolder() + "retryOrIgnore.txt";
+            string sFile = Folders.GetOutputFolder() + "retryOrIgnore.txt";
             File.WriteAllText(sFile, retryOrIgnore);
         }
 
         public static void WriteResult(bool bok)
         {
-            string sFile = GetExeFolder() + "result.txt";
+            string sFile = Folders.GetOutputFolder() + "result.txt";
             File.WriteAllText(sFile, bok.ToString());
         }
 
-        public static string GetExeFolder()
-        {
-            string s = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            return s + "\\";
-        }
+       
 
         //public static void Convert2CSV()
         //{

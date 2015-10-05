@@ -426,17 +426,18 @@ namespace Guarder
         private void UpdateCertianDstExpectedBarcode(string barcode,int colIndex, int rowIndex)
         {
             int slices = packageInfo.dstSlices;
-            int regionIndex = colIndex / packageInfo.srcSlices;
-
+            //int regionIndex = colIndex / packageInfo.srcSlices;
+            int curRegion = colIndex / packageInfo.srcSlices;
+            int indexInRegion = colIndex % packageInfo.srcSlices;
+            if (indexInRegion != 0)
+                return;
             for (int sliceIndex = 0; sliceIndex < slices; sliceIndex++)
             {
-                int dstGrid = GetDstStartGrid() + regionIndex * packageInfo.dstSlices + sliceIndex;
+                int dstGrid = GetDstStartGrid() + curRegion * packageInfo.dstSlices + sliceIndex;
                 if (!eachGridBarcodes.ContainsKey(dstGrid))
                     continue;
-                if (eachGridBarcodes[dstGrid].Count <= sliceIndex)
-                    continue;
                 eachGridBarcodes[dstGrid][rowIndex] = CalculdateCorrespondingBarcode(barcode, true, sliceIndex);
-                //UpdateThisGridExpectedBarcode(eachGridBarcodes[dstGrid],sliceIndex, barcodes, results);
+                AddHintInfo(string.Format("刷新行{0}条{1}处的期望条码成{2}", rowIndex + 1, dstGrid, barcode), System.Drawing.Color.Blue);
             }
         }
 
@@ -492,7 +493,10 @@ namespace Guarder
         private string CalculdateCorrespondingBarcode(string srcBarcode, bool bValid, int sliceIndex)
         {
             if (!bValid)
+            {
+                //AddErrorInfo(string.Format("条码设置错误{0}，请重新设置", srcBarcode));
                 return dummy;
+            }
             string year = (DateTime.Now.Year % 100).ToString();
             string s = srcBarcode;
           

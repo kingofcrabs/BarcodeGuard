@@ -29,7 +29,7 @@ namespace Guarder
 
         void GuardForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            string folder = Helper.GetExeFolder() + DateTime.Now.ToString("yyyyMMdd") + "\\";
+            string folder = Folders.GetOutputFolder() + DateTime.Now.ToString("yyyyMMdd") + "\\";
             if (!Directory.Exists(folder))
                 Directory.CreateDirectory(folder);
             string file = folder + DateTime.Now.ToString("HHmmss") + ".csv";
@@ -102,6 +102,7 @@ namespace Guarder
 
         void Main_Load(object sender, EventArgs e)
         {
+            lblVersion.Text = "版本号：" + strings.version;
             CreateNamedPipeServer();
             dataGridView.Visible = false;
         }
@@ -226,10 +227,10 @@ namespace Guarder
                 AddErrorInfo(errMsg);
                 Helper.WriteResult(false);
             }
-         
-
+            //update no check
+            UpdateGridCells(grid, barcodes);
             //check ok, if not ok, show concrete information.
-            bool bok = CheckBarcodes(grid, results);
+            bool bok = CheckBarcodes(grid,barcodes, results);
             //update ui
             UpdateGridCells(grid, barcodes, results);
             if(bok)
@@ -238,20 +239,30 @@ namespace Guarder
                 AddHintInfo(string.Format("Grid{0}条码检查通过！", grid), Color.DarkGreen);
             }
             else
+            {
                 ShowErrorDialog(grid);
-      
+                AddErrorInfo(GetLatestError());
+            }
             Helper.WriteResult(bok);
         }
 
-        private bool CheckBarcodes(int grid, List<bool> results)
+        private string GetLatestError()
+        {
+            ErrorInfo errInfo = errorsInfo.Last();
+            if(errInfo == null)
+                return "未知错误！";
+            return string.Format("位于{0}行条码错误：期望条码{1}，实际条码{2}", errInfo.LineNumber, errInfo.ExpectedBarcode, errInfo.Barcode);
+        }
+
+        private bool CheckBarcodes(int grid,List<string> barcodes, List<bool> results)
         {
             errorsInfo.Clear();
             for(int i = 0; i< GlobalVars.Instance.eachGridExpectedBarcodes[grid].Count ; i++)
             {
                 bool bok = IsValidBarcode(grid,i);
                 results.Add(bok);
-                
-                string actualBarcode = dataGridView.Rows[i].Cells[grid].Value.ToString() ;
+
+                string actualBarcode = barcodes[i];
                 string expectedBarcode = GlobalVars.Instance.eachGridExpectedBarcodes[grid][i];
                 string errMsg = bok ? "" : "条码不匹配！";
                 errorsInfo.Add(new ErrorInfo(i+1,actualBarcode,expectedBarcode,errMsg,bok));
@@ -265,30 +276,19 @@ namespace Guarder
              sourceErrorForm.ShowDialog();
         }
 
-    
-
-        private void UpdateGridCells(int grid, List<string> barcodes, List<bool> checkResults)
+        private void UpdateGridCells(int grid, List<string> barcodes, List<bool> checkResults = null)
         {
             programModify = true;
             for (int i = 0; i < barcodes.Count; i++)
             {
                 int colIndex = GlobalVars.Instance.eachGridExpectedBarcodes.Keys.ToList().FindIndex(x => x == grid);
                 dataGridView.Rows[i].Cells[colIndex].Value = barcodes[i];
-                dataGridView.Rows[i].Cells[colIndex].Style.BackColor = checkResults[i] ? Color.LightGreen : Color.Red;
-                dataGridView.Rows[i].Cells[colIndex].ReadOnly = checkResults[i];
+                if(checkResults != null && i < checkResults.Count )
+                {
+                    dataGridView.Rows[i].Cells[colIndex].Style.BackColor = checkResults[i] ? Color.LightGreen : Color.Red;
+                    dataGridView.Rows[i].Cells[colIndex].ReadOnly = checkResults[i];
+                }
             }
-            programModify = false;
-        }
-
-        private void UpdateGridCell(int gridID, int i, string expectedBarcode, string actualBarcode)
-        {
-            programModify = true;
-            bool isEqual = expectedBarcode == actualBarcode;
-            int colIndex = gridID - GlobalVars.Instance.StartGridID;
-            dataGridView.Rows[i].Cells[colIndex].Value = actualBarcode;
-            dataGridView.Rows[i].Cells[colIndex].Style.BackColor = isEqual ? Color.LightGreen : Color.Red;
-            if (isEqual)
-                dataGridView.Rows[i].Cells[colIndex].ReadOnly = true;
             programModify = false;
         }
 
@@ -319,9 +319,12 @@ namespace Guarder
         #endregion
 
 
-        bool IsValidBarcode(int grid, int row)
+        bool IsValidBarcode(int gridID, int row)
         {
-           return  dataGridView.Rows[row].Cells[grid].Value.ToString() == GlobalVars.Instance.eachGridExpectedBarcodes[grid][row];
+            int gridIndex = gridID - GlobalVars.Instance.StartGridID;
+            string curCellText = dataGridView.Rows[row].Cells[gridIndex].Value.ToString().Trim();
+            string expectedBarcode = GlobalVars.Instance.eachGridExpectedBarcodes[gridID][row];
+            return curCellText == expectedBarcode;
         }
         private void dataGridView_CurrentCellChanged(object sender, EventArgs e)
         {
@@ -414,11 +417,12 @@ namespace Guarder
                 return;
             }
             EnableControls(false);
-            
-            Helper.CloseWaiter(GlobalVars.Instance.WaiterName);
             GlobalVars.Instance.PlateCnt = plateCnt;
             GlobalVars.Instance.eachGridExpectedBarcodes = ExcelReader.ReadBarcodes();
             int gridCnt = GlobalVars.Instance.eachGridExpectedBarcodes.Count;
+            sampleCnt = GlobalVars.Instance.eachGridExpectedBarcodes.Sum(x => x.Value.Count);
+            txtSampleCount.Text = sampleCnt.ToString();
+            Helper.CloseWaiter(strings.NotifierName);
             Helper.WriteGridCnt(gridCnt);
             InitDataGridView(gridCnt);
         }
