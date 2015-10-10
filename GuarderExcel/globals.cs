@@ -11,6 +11,7 @@ namespace Guarder
         static GlobalVars instance = null;
         #region configures
         private int startGridID = int.Parse(ConfigurationManager.AppSettings["startGrid"]);
+        private int plateStartGridID = int.Parse(ConfigurationManager.AppSettings["plateStartGrid"]);
         #endregion
         public static GlobalVars Instance
         {
@@ -29,6 +30,7 @@ namespace Guarder
         }
 
         public Dictionary<int, List<string>> eachGridExpectedBarcodes = new Dictionary<int, List<string>>();
+        public List<string> eachPlateExpectedBarcodes = new List<string>();
 
 
         private static string GetSetting(string key)
@@ -36,7 +38,13 @@ namespace Guarder
             return ConfigurationManager.AppSettings[key];
         }
 
-
+        public int PlateStartGridID
+        {
+            get
+            {
+                return plateStartGridID;
+            }
+        }
 
         public int StartGridID
         {

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Guarder {
+namespace GuarderExcel {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Guarder {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Guarder.strings", typeof(strings).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GuarderExcel.strings", typeof(strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

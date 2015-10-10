@@ -11,7 +11,7 @@ namespace Guarder
     {
         const int plateBarcodeStartLine = 7;
         
-        public static Dictionary<int,List<string>> ReadBarcodes()
+        static public void ReadBarcodes()
         {
             string sFolder = GlobalVars.Instance.ExcelFolder;
             var di = new DirectoryInfo(sFolder);
@@ -25,26 +25,25 @@ namespace Guarder
                 File.Delete(csvFilePath);
             SaveAsCSV(new List<string>() { sFilePath });
             List<string> lines = File.ReadAllLines(csvFilePath).ToList();
-            Dictionary<int, List<string>> grid_Barcodes = new Dictionary<int, List<string>>();
+            GlobalVars.Instance.eachGridExpectedBarcodes.Clear();
+            GlobalVars.Instance.eachPlateExpectedBarcodes.Clear();
             int curGrid = GlobalVars.Instance.StartGridID;
             for(int i = 0; i< GlobalVars.Instance.PlateCnt; i++)
             {
                 int startLine = i * 10 + plateBarcodeStartLine -1;
                 string barcodeLine = lines[startLine];
                 string barcode = ParsePlateBarcode(barcodeLine);
+                GlobalVars.Instance.eachPlateExpectedBarcodes.Add(barcode);
                 GlobalVars.Instance.PlateBarcodes.Add(barcode);
                 List<string> thisPlateBarcodes = ParseWellBarcodes(lines, startLine);
                 while(thisPlateBarcodes.Count > 0)
                 {
                     var thisGridBarcodes = thisPlateBarcodes.Take(16).ToList();
-                    grid_Barcodes.Add(curGrid++, thisGridBarcodes);
+                    GlobalVars.Instance.eachGridExpectedBarcodes.Add(curGrid++, thisGridBarcodes);
                     thisPlateBarcodes = thisPlateBarcodes.Skip(thisGridBarcodes.Count).ToList();
                 }
-                //plate_Barcodes.Add(i + 1, thisPlateBarcodes);
+                
             }
-
-            return grid_Barcodes;
-
         }
 
         private static List<string> ParseWellBarcodes(List<string> lines, int startLine)

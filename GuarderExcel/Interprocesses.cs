@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO.Pipes;
 using System.Windows.Forms;
+using GuarderExcel;
 
 namespace Guarder
 {

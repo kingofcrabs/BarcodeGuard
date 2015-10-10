@@ -44,6 +44,8 @@
             this.label5 = new System.Windows.Forms.Label();
             this.txtSampleCount = new System.Windows.Forms.TextBox();
             this.btnSet = new System.Windows.Forms.Button();
+            this.label7 = new System.Windows.Forms.Label();
+            this.txtMP3Barcodes = new System.Windows.Forms.RichTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -54,10 +56,10 @@
             this.dataGridView.AllowUserToResizeColumns = false;
             this.dataGridView.AllowUserToResizeRows = false;
             this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView.Location = new System.Drawing.Point(10, 65);
+            this.dataGridView.Location = new System.Drawing.Point(122, 65);
             this.dataGridView.Name = "dataGridView";
             this.dataGridView.RowTemplate.Height = 23;
-            this.dataGridView.Size = new System.Drawing.Size(1143, 399);
+            this.dataGridView.Size = new System.Drawing.Size(1031, 399);
             this.dataGridView.TabIndex = 0;
             this.dataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellValueChanged);
             this.dataGridView.CurrentCellChanged += new System.EventHandler(this.dataGridView_CurrentCellChanged);
@@ -65,11 +67,11 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(10, 50);
+            this.label1.Location = new System.Drawing.Point(120, 50);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(89, 12);
             this.label1.TabIndex = 1;
-            this.label1.Text = "扫描出的条码：";
+            this.label1.Text = "16位载架条码：";
             // 
             // label2
             // 
@@ -191,11 +193,33 @@
             this.btnSet.UseVisualStyleBackColor = true;
             this.btnSet.Click += new System.EventHandler(this.btnSet_Click);
             // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Location = new System.Drawing.Point(10, 50);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(59, 12);
+            this.label7.TabIndex = 19;
+            this.label7.Text = "MP3条码：";
+            // 
+            // txtMP3Barcodes
+            // 
+            this.txtMP3Barcodes.Font = new System.Drawing.Font("宋体", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.txtMP3Barcodes.HideSelection = false;
+            this.txtMP3Barcodes.Location = new System.Drawing.Point(10, 65);
+            this.txtMP3Barcodes.Name = "txtMP3Barcodes";
+            this.txtMP3Barcodes.ReadOnly = true;
+            this.txtMP3Barcodes.Size = new System.Drawing.Size(106, 399);
+            this.txtMP3Barcodes.TabIndex = 20;
+            this.txtMP3Barcodes.Text = "";
+            // 
             // GuardForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1162, 672);
+            this.Controls.Add(this.txtMP3Barcodes);
+            this.Controls.Add(this.label7);
             this.Controls.Add(this.btnSet);
             this.Controls.Add(this.txtSampleCount);
             this.Controls.Add(this.label5);
@@ -237,6 +261,8 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox txtSampleCount;
         private System.Windows.Forms.Button btnSet;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.RichTextBox txtMP3Barcodes;
     }
 }
 

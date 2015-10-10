@@ -7,8 +7,8 @@
     <ProjectGuid>{3537EEC3-F7A3-44D5-B9AF-CAF48A33ADB9}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Guarder</RootNamespace>
-    <AssemblyName>Guarder</AssemblyName>
+    <RootNamespace>GuarderExcel</RootNamespace>
+    <AssemblyName>GuarderExcel</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -35,7 +35,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>shield.ico</ApplicationIcon>
+    <ApplicationIcon>excel.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Office.Interop.Excel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
@@ -116,8 +116,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="excel.ico" />
     <Content Include="history.txt" />
-    <Content Include="shield.ico" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="SourceErrors.xaml">
@@ -127,8 +127,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y   $(TargetDir)$(TargetName).exe "C:\BarcodeGuard\bins\"
-xcopy /Y   $(TargetDir)$(TargetName).exe.config "C:\BarcodeGuard\bins\"</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y   $(TargetDir)$(TargetName).exe "C:\BarcodeGuardExcel\bins\"
+xcopy /Y   $(TargetDir)$(TargetName).exe.config "C:\BarcodeGuardExcel\bins\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

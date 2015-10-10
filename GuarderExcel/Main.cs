@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Configuration;
 using System.IO;
 using System.Threading;
+using GuarderExcel;
 
 namespace Guarder
 {
@@ -220,19 +221,39 @@ namespace Guarder
             List<string> barcodes = new List<string>();
             List<bool> results = new List<bool>();
             ReadBarcode(ref grid, barcodes);
-            //check grid is valid
-            if (!GlobalVars.Instance.eachGridExpectedBarcodes.ContainsKey(grid))
+            bool bok = false;
+            if(grid == GlobalVars.Instance.PlateStartGridID)
             {
-                string  errMsg = string.Format("当前扫描Grid{0}位置不在期望的试管载架中！", grid);
-                AddErrorInfo(errMsg);
-                Helper.WriteResult(false);
+                txtMP3Barcodes.Text = "";
+                for (int i = 0; i < GlobalVars.Instance.PlateCnt; i++)
+                {
+                    string expectedBarcode = GlobalVars.Instance.eachPlateExpectedBarcodes[i];
+                    string actualBarcode = barcodes[i];
+                    bool isCorrect = expectedBarcode == actualBarcode;
+                    string errMsg = isCorrect ? "" : "条码不匹配！";
+                    errorsInfo.Add(new ErrorInfo(i + 1, actualBarcode, expectedBarcode, errMsg, isCorrect));
+                    txtMP3Barcodes.SelectionColor = isCorrect ? Color.DarkGreen : Color.Red;
+                    txtMP3Barcodes.AppendText(actualBarcode + "\r\n");
+                }
             }
-            //update no check
-            UpdateGridCells(grid, barcodes);
-            //check ok, if not ok, show concrete information.
-            bool bok = CheckBarcodes(grid,barcodes, results);
-            //update ui
-            UpdateGridCells(grid, barcodes, results);
+            else
+            {
+                //check grid is valid
+                if (!GlobalVars.Instance.eachGridExpectedBarcodes.ContainsKey(grid))
+                {
+                    string errMsg = string.Format("当前扫描Grid{0}位置不在期望的试管载架中！", grid);
+                    AddErrorInfo(errMsg);
+                    Helper.WriteResult(false);
+                }
+                //update no check
+                UpdateGridCells(grid, barcodes);
+                //check ok, if not ok, show concrete information.
+                bok = CheckBarcodes(grid, barcodes, results);
+                //update ui
+                UpdateGridCells(grid, barcodes, results);
+            }
+
+         
             if(bok)
             {
                 Helper.CloseWaiter(strings.NotifierName);
@@ -248,7 +269,7 @@ namespace Guarder
 
         private string GetLatestError()
         {
-            ErrorInfo errInfo = errorsInfo.Last();
+            ErrorInfo errInfo = errorsInfo.Last(x => !x.IsCorrect);
             if(errInfo == null)
                 return "未知错误！";
             return string.Format("位于{0}行条码错误：期望条码{1}，实际条码{2}", errInfo.LineNumber, errInfo.ExpectedBarcode, errInfo.Barcode);
@@ -297,13 +318,24 @@ namespace Guarder
             string posIDFile = ConfigurationManager.AppSettings["posIDFile"];
             List<string> contents = File.ReadAllLines(posIDFile).ToList();
             contents = contents.Where(x => x != "").ToList();
-            if (contents.Count() != 17)
-                throw new Exception("条码文件行数不是17！");
+            
             string firstLine = contents[1];
             string[] strs = firstLine.Split(';');
             grid = int.Parse(strs[0]);
             barcodes.Clear();
             contents.RemoveAt(0);
+            bool isPlateGrid = GlobalVars.Instance.PlateStartGridID == grid;
+            if(isPlateGrid)
+            {
+                if (contents.Count > 3)
+                    throw new Exception(string.Format("条码行数为{0}，不等于3！", contents.Count));
+            }
+            else
+            {
+              if (contents.Count() != 16)
+                throw new Exception(string.Format("条码行数为{0},不等于16！",contents.Count));      
+             }
+            
             foreach(string s in contents)
             {
                 barcodes.Add(Parse(s));
@@ -418,7 +450,7 @@ namespace Guarder
             }
             EnableControls(false);
             GlobalVars.Instance.PlateCnt = plateCnt;
-            GlobalVars.Instance.eachGridExpectedBarcodes = ExcelReader.ReadBarcodes();
+            ExcelReader.ReadBarcodes();
             int gridCnt = GlobalVars.Instance.eachGridExpectedBarcodes.Count;
             sampleCnt = GlobalVars.Instance.eachGridExpectedBarcodes.Sum(x => x.Value.Count);
             txtSampleCount.Text = sampleCnt.ToString();
