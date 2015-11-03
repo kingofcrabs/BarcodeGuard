@@ -105,6 +105,7 @@ namespace Guarder
         {
             lblVersion.Text = "版本号：" + strings.version;
             CreateNamedPipeServer();
+            Helper.WriteRetryOrIgnore(false);
             dataGridView.Visible = false;
         }
 
@@ -206,6 +207,20 @@ namespace Guarder
 
         internal void ExecuteCommand(string sCommand)
         {
+            try
+            {
+                ExecuteCommandImpl(sCommand);
+            }
+            catch(Exception ex)
+            {
+                AddErrorInfo("Error happened in execute command: " + ex.Message);
+            }
+            
+            
+        }
+
+        private void ExecuteCommandImpl(string sCommand)
+        {
             if (sCommand.Contains("shutdown"))
             {
                 this.Close();
@@ -213,7 +228,7 @@ namespace Guarder
             }
             if (sCommand != "")
             {
-                //txtLog.AppendText(sCommand + "\r\n");
+                txtLog.AppendText(sCommand + "\r\n");
             }
 
 
@@ -222,17 +237,17 @@ namespace Guarder
             List<bool> results = new List<bool>();
             ReadBarcode(ref grid, barcodes);
             bool bok = false;
-            if(grid == GlobalVars.Instance.PlateStartGridID)
+            if (grid == GlobalVars.Instance.PlateStartGridID)
             {
                 txtMP3Barcodes.Text = "";
                 for (int i = 0; i < GlobalVars.Instance.PlateCnt; i++)
                 {
                     string expectedBarcode = GlobalVars.Instance.eachPlateExpectedBarcodes[i];
                     string actualBarcode = barcodes[i];
-                    bool isCorrect = expectedBarcode == actualBarcode;
-                    string errMsg = isCorrect ? "" : "条码不匹配！";
-                    errorsInfo.Add(new ErrorInfo(i + 1, actualBarcode, expectedBarcode, errMsg, isCorrect));
-                    txtMP3Barcodes.SelectionColor = isCorrect ? Color.DarkGreen : Color.Red;
+                    bok = expectedBarcode == actualBarcode;
+                    string errMsg = bok ? "" : "条码不匹配！";
+                    errorsInfo.Add(new ErrorInfo(i + 1, actualBarcode, expectedBarcode, errMsg, bok));
+                    txtMP3Barcodes.SelectionColor = bok ? Color.DarkGreen : Color.Red;
                     txtMP3Barcodes.AppendText(actualBarcode + "\r\n");
                 }
             }
@@ -253,8 +268,8 @@ namespace Guarder
                 UpdateGridCells(grid, barcodes, results);
             }
 
-         
-            if(bok)
+
+            if (bok)
             {
                 Helper.CloseWaiter(strings.NotifierName);
                 AddHintInfo(string.Format("Grid{0}条码检查通过！", grid), Color.DarkGreen);
