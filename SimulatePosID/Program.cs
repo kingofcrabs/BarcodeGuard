@@ -56,7 +56,7 @@ namespace SimulatePosID
                     }
                 }
             }
-            File.WriteAllLines(@"C:\posID\scan.csv",strs);
+            File.WriteAllLines(@"C:\ProgramData\Tecan\EVOware\output\scan.csv", strs);
         }
     }
 

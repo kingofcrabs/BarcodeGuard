@@ -173,8 +173,8 @@ namespace Guarder
             string keyInfo = isRetry ? "按下重试键\r\n" : "按下忽略键\r\n";
             richTextInfo.SelectionColor = Color.Blue;
             richTextInfo.AppendText(keyInfo);
-            Helper.CloseWaiter(strings.NotifierName);
             Helper.WriteRetryOrIgnore(isRetry);
+            Helper.CloseWaiter(strings.NotifierName);
         }
 
         private void btnIgnore_Click(object sender, EventArgs e)
