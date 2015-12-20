@@ -79,7 +79,7 @@ namespace GuarderExcel {
         }
         
         /// <summary>
-        ///   查找类似 0.05 的本地化字符串。
+        ///   查找类似 0.06 的本地化字符串。
         /// </summary>
         internal static string version {
             get {
