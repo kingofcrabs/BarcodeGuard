@@ -10,17 +10,17 @@ namespace Guarder
     class ExcelReader
     {
         const int plateBarcodeStartLine = 7;
-        
+        const string suffix = ".xlsm";
         static public void ReadBarcodes()
         {
             string sFolder = GlobalVars.Instance.ExcelFolder;
             var di = new DirectoryInfo(sFolder);
-            var last = di.EnumerateFiles("*.xlsx")
+            var last = di.EnumerateFiles("*" + suffix)
                                 .OrderBy(d => d.CreationTime)
                                 .Last();
             string sFilePath = last.FullName;
             int plateCnt = GlobalVars.Instance.PlateCnt;
-            string csvFilePath = sFilePath.Replace("xlsx", "csv");
+            string csvFilePath = sFilePath.Replace(suffix, "csv");
             if (File.Exists(csvFilePath))
                 File.Delete(csvFilePath);
             SaveAsCSV(new List<string>() { sFilePath });
