@@ -45,7 +45,9 @@
             this.txtSampleCount = new System.Windows.Forms.TextBox();
             this.btnSet = new System.Windows.Forms.Button();
             this.label7 = new System.Windows.Forms.Label();
-            this.txtMP3Barcodes = new System.Windows.Forms.RichTextBox();
+            this.lstMP3Barcode = new System.Windows.Forms.ListBox();
+            this.txtCurBarcode = new System.Windows.Forms.TextBox();
+            this.btnRefresh = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -56,10 +58,10 @@
             this.dataGridView.AllowUserToResizeColumns = false;
             this.dataGridView.AllowUserToResizeRows = false;
             this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView.Location = new System.Drawing.Point(122, 65);
+            this.dataGridView.Location = new System.Drawing.Point(122, 70);
             this.dataGridView.Name = "dataGridView";
             this.dataGridView.RowTemplate.Height = 23;
-            this.dataGridView.Size = new System.Drawing.Size(1031, 399);
+            this.dataGridView.Size = new System.Drawing.Size(1031, 432);
             this.dataGridView.TabIndex = 0;
             this.dataGridView.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView_CellValueChanged);
             this.dataGridView.CurrentCellChanged += new System.EventHandler(this.dataGridView_CurrentCellChanged);
@@ -67,9 +69,9 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(120, 50);
+            this.label1.Location = new System.Drawing.Point(120, 54);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(89, 12);
+            this.label1.Size = new System.Drawing.Size(91, 13);
             this.label1.TabIndex = 1;
             this.label1.Text = "16位载架条码：";
             // 
@@ -77,7 +79,7 @@
             // 
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("宋体", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.label2.Location = new System.Drawing.Point(10, 484);
+            this.label2.Location = new System.Drawing.Point(10, 524);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(72, 13);
             this.label2.TabIndex = 2;
@@ -86,26 +88,26 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(738, 485);
+            this.label3.Location = new System.Drawing.Point(738, 525);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(41, 12);
+            this.label3.Size = new System.Drawing.Size(43, 13);
             this.label3.TabIndex = 4;
             this.label3.Text = "日志：";
             // 
             // txtLog
             // 
-            this.txtLog.Location = new System.Drawing.Point(740, 510);
+            this.txtLog.Location = new System.Drawing.Point(740, 553);
             this.txtLog.Multiline = true;
             this.txtLog.Name = "txtLog";
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(410, 138);
+            this.txtLog.Size = new System.Drawing.Size(410, 149);
             this.txtLog.TabIndex = 5;
             // 
             // btnIgnore
             // 
-            this.btnIgnore.Location = new System.Drawing.Point(627, 510);
+            this.btnIgnore.Location = new System.Drawing.Point(627, 553);
             this.btnIgnore.Name = "btnIgnore";
-            this.btnIgnore.Size = new System.Drawing.Size(75, 23);
+            this.btnIgnore.Size = new System.Drawing.Size(75, 25);
             this.btnIgnore.TabIndex = 6;
             this.btnIgnore.Text = "忽略";
             this.btnIgnore.UseVisualStyleBackColor = true;
@@ -113,9 +115,9 @@
             // 
             // btnRetry
             // 
-            this.btnRetry.Location = new System.Drawing.Point(627, 539);
+            this.btnRetry.Location = new System.Drawing.Point(627, 584);
             this.btnRetry.Name = "btnRetry";
-            this.btnRetry.Size = new System.Drawing.Size(75, 23);
+            this.btnRetry.Size = new System.Drawing.Size(75, 25);
             this.btnRetry.TabIndex = 7;
             this.btnRetry.Text = "重试";
             this.btnRetry.UseVisualStyleBackColor = true;
@@ -125,69 +127,69 @@
             // 
             this.richTextInfo.Font = new System.Drawing.Font("宋体", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.richTextInfo.HideSelection = false;
-            this.richTextInfo.Location = new System.Drawing.Point(10, 509);
+            this.richTextInfo.Location = new System.Drawing.Point(10, 551);
             this.richTextInfo.Name = "richTextInfo";
             this.richTextInfo.ReadOnly = true;
-            this.richTextInfo.Size = new System.Drawing.Size(611, 139);
+            this.richTextInfo.Size = new System.Drawing.Size(611, 150);
             this.richTextInfo.TabIndex = 9;
             this.richTextInfo.Text = "";
             // 
             // txtPlateCount
             // 
-            this.txtPlateCount.Location = new System.Drawing.Point(58, 12);
+            this.txtPlateCount.Location = new System.Drawing.Point(58, 13);
             this.txtPlateCount.Name = "txtPlateCount";
-            this.txtPlateCount.Size = new System.Drawing.Size(100, 21);
+            this.txtPlateCount.Size = new System.Drawing.Size(100, 20);
             this.txtPlateCount.TabIndex = 10;
             this.txtPlateCount.Text = "1";
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(10, 16);
+            this.label4.Location = new System.Drawing.Point(10, 17);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(41, 12);
+            this.label4.Size = new System.Drawing.Size(43, 13);
             this.label4.TabIndex = 11;
             this.label4.Text = "板数：";
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(668, 16);
+            this.label6.Location = new System.Drawing.Point(668, 17);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(53, 12);
+            this.label6.Size = new System.Drawing.Size(55, 13);
             this.label6.TabIndex = 14;
             this.label6.Text = "版本号：";
             // 
             // lblVersion
             // 
             this.lblVersion.AutoSize = true;
-            this.lblVersion.Location = new System.Drawing.Point(727, 15);
+            this.lblVersion.Location = new System.Drawing.Point(727, 16);
             this.lblVersion.Name = "lblVersion";
-            this.lblVersion.Size = new System.Drawing.Size(0, 12);
+            this.lblVersion.Size = new System.Drawing.Size(0, 13);
             this.lblVersion.TabIndex = 15;
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(402, 16);
+            this.label5.Location = new System.Drawing.Point(402, 17);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(53, 12);
+            this.label5.Size = new System.Drawing.Size(55, 13);
             this.label5.TabIndex = 16;
             this.label5.Text = "样品数：";
             // 
             // txtSampleCount
             // 
-            this.txtSampleCount.Location = new System.Drawing.Point(456, 12);
+            this.txtSampleCount.Location = new System.Drawing.Point(456, 13);
             this.txtSampleCount.Name = "txtSampleCount";
             this.txtSampleCount.ReadOnly = true;
-            this.txtSampleCount.Size = new System.Drawing.Size(100, 21);
+            this.txtSampleCount.Size = new System.Drawing.Size(100, 20);
             this.txtSampleCount.TabIndex = 17;
             // 
             // btnSet
             // 
-            this.btnSet.Location = new System.Drawing.Point(164, 11);
+            this.btnSet.Location = new System.Drawing.Point(164, 12);
             this.btnSet.Name = "btnSet";
-            this.btnSet.Size = new System.Drawing.Size(75, 21);
+            this.btnSet.Size = new System.Drawing.Size(75, 23);
             this.btnSet.TabIndex = 18;
             this.btnSet.Text = "设置";
             this.btnSet.UseVisualStyleBackColor = true;
@@ -196,29 +198,45 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(10, 50);
+            this.label7.Location = new System.Drawing.Point(10, 54);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(59, 12);
+            this.label7.Size = new System.Drawing.Size(65, 13);
             this.label7.TabIndex = 19;
             this.label7.Text = "MP3条码：";
             // 
-            // txtMP3Barcodes
+            // lstMP3Barcode
             // 
-            this.txtMP3Barcodes.Font = new System.Drawing.Font("宋体", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
-            this.txtMP3Barcodes.HideSelection = false;
-            this.txtMP3Barcodes.Location = new System.Drawing.Point(10, 65);
-            this.txtMP3Barcodes.Name = "txtMP3Barcodes";
-            this.txtMP3Barcodes.ReadOnly = true;
-            this.txtMP3Barcodes.Size = new System.Drawing.Size(106, 399);
-            this.txtMP3Barcodes.TabIndex = 20;
-            this.txtMP3Barcodes.Text = "";
+            this.lstMP3Barcode.FormattingEnabled = true;
+            this.lstMP3Barcode.Location = new System.Drawing.Point(13, 71);
+            this.lstMP3Barcode.Name = "lstMP3Barcode";
+            this.lstMP3Barcode.Size = new System.Drawing.Size(103, 134);
+            this.lstMP3Barcode.TabIndex = 20;
+            // 
+            // txtCurBarcode
+            // 
+            this.txtCurBarcode.Location = new System.Drawing.Point(13, 211);
+            this.txtCurBarcode.Name = "txtCurBarcode";
+            this.txtCurBarcode.Size = new System.Drawing.Size(103, 20);
+            this.txtCurBarcode.TabIndex = 21;
+            // 
+            // btnRefresh
+            // 
+            this.btnRefresh.Location = new System.Drawing.Point(13, 237);
+            this.btnRefresh.Name = "btnRefresh";
+            this.btnRefresh.Size = new System.Drawing.Size(103, 23);
+            this.btnRefresh.TabIndex = 22;
+            this.btnRefresh.Text = "刷新";
+            this.btnRefresh.UseVisualStyleBackColor = true;
+            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             // 
             // GuardForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1162, 672);
-            this.Controls.Add(this.txtMP3Barcodes);
+            this.ClientSize = new System.Drawing.Size(1162, 728);
+            this.Controls.Add(this.btnRefresh);
+            this.Controls.Add(this.txtCurBarcode);
+            this.Controls.Add(this.lstMP3Barcode);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.btnSet);
             this.Controls.Add(this.txtSampleCount);
@@ -262,7 +280,9 @@
         private System.Windows.Forms.TextBox txtSampleCount;
         private System.Windows.Forms.Button btnSet;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.RichTextBox txtMP3Barcodes;
+        private System.Windows.Forms.ListBox lstMP3Barcode;
+        private System.Windows.Forms.TextBox txtCurBarcode;
+        private System.Windows.Forms.Button btnRefresh;
     }
 }
 

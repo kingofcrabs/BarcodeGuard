@@ -107,6 +107,42 @@ namespace Guarder
             CreateNamedPipeServer();
             Helper.WriteRetryOrIgnore(false);
             dataGridView.Visible = false;
+            lstMP3Barcode.DrawMode = DrawMode.OwnerDrawFixed;
+            lstMP3Barcode.DrawItem += lstMP3Barcode_DrawItem;
+            lstMP3Barcode.SelectedIndexChanged += LstMP3Barcode_SelectedIndexChanged;
+        }
+
+        private void LstMP3Barcode_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            this.Refresh();
+        }
+
+        private void lstMP3Barcode_DrawItem(object sender, DrawItemEventArgs e)
+        {
+            Brush myBrush = Brushes.Black;
+            if (e.Index < 0)
+                return;
+            string allText = lstMP3Barcode.Items[e.Index].ToString();
+            string s2Show = "";
+            if(allText != "") 
+            {
+                string[] contents = allText.Split(':');
+                s2Show = contents[0];
+                bool isError = contents[1] == "e";
+                myBrush = isError ? Brushes.Red : Brushes.Green;
+            
+            }
+           
+            e.DrawBackground();
+            Brush backGroundBrush = Brushes.White;
+            if (e.Index == lstMP3Barcode.SelectedIndex)
+            {
+                backGroundBrush = Brushes.Wheat;
+            }
+            e.Graphics.FillRectangle(backGroundBrush, e.Bounds);
+            e.DrawFocusRectangle();//焦点框          
+            e.Graphics.DrawString(s2Show, e.Font,
+               myBrush, e.Bounds, StringFormat.GenericDefault);
         }
 
 
@@ -226,12 +262,12 @@ namespace Guarder
                 this.Close();
                 return;
             }
+
             if (sCommand != "")
             {
                 txtLog.AppendText(sCommand + "\r\n");
             }
-
-
+            
             int grid = 0;
             List<string> barcodes = new List<string>();
             List<bool> results = new List<bool>();
@@ -239,7 +275,8 @@ namespace Guarder
             bool bok = false;
             if (grid == GlobalVars.Instance.PlateStartGridID)
             {
-                txtMP3Barcodes.Text = "";
+                errorsInfo.Clear();
+                lstMP3Barcode.Items.Clear();
                 for (int i = 0; i < GlobalVars.Instance.PlateCnt; i++)
                 {
                     string expectedBarcode = GlobalVars.Instance.eachPlateExpectedBarcodes[i];
@@ -247,9 +284,11 @@ namespace Guarder
                     bok = expectedBarcode == actualBarcode;
                     string errMsg = bok ? "" : "条码不匹配！";
                     errorsInfo.Add(new ErrorInfo(i + 1, actualBarcode, expectedBarcode, errMsg, bok));
-                    txtMP3Barcodes.SelectionColor = bok ? Color.DarkGreen : Color.Red;
-                    txtMP3Barcodes.AppendText(actualBarcode + "\r\n");
+                    string suffix = bok ? ":r" : ":e";
+                    lstMP3Barcode.Items.Add(actualBarcode+suffix);
                 }
+                if (lstMP3Barcode.Items.Count > 0)
+                    lstMP3Barcode.SelectedIndex = 0;
             }
             else
             {
@@ -331,6 +370,11 @@ namespace Guarder
         private void ReadBarcode(ref int grid, List<string> barcodes)
         {
             string posIDFile = ConfigurationManager.AppSettings["posIDFile"];
+            if(!File.Exists(posIDFile))
+            {
+                throw new Exception("载架扫描失败！");
+            }
+
             List<string> contents = File.ReadAllLines(posIDFile).ToList();
             contents = contents.Where(x => x != "").ToList();
             
@@ -463,21 +507,45 @@ namespace Guarder
                 SetErrorInfo("板数必须在1~3之间！");
                 return;
             }
-            EnableControls(false);
-            GlobalVars.Instance.PlateCnt = plateCnt;
-            ExcelReader.ReadBarcodes();
-            int gridCnt = GlobalVars.Instance.eachGridExpectedBarcodes.Count;
-            sampleCnt = GlobalVars.Instance.eachGridExpectedBarcodes.Sum(x => x.Value.Count);
-            txtSampleCount.Text = sampleCnt.ToString();
-            Helper.CloseWaiter(strings.NotifierName);
-            Helper.WriteGridCnt(gridCnt);
-            InitDataGridView(gridCnt);
+            try
+            {
+                EnableControls(false);
+                GlobalVars.Instance.PlateCnt = plateCnt;
+                ExcelReader.ReadBarcodes();
+                int gridCnt = GlobalVars.Instance.eachGridExpectedBarcodes.Count;
+                sampleCnt = GlobalVars.Instance.eachGridExpectedBarcodes.Sum(x => x.Value.Count);
+                txtSampleCount.Text = sampleCnt.ToString();
+                Helper.CloseWaiter(strings.NotifierName);
+                Helper.WriteGridCnt(gridCnt);
+                InitDataGridView(gridCnt);
+            }
+            catch(Exception ex)
+            {
+                AddErrorInfo(ex.Message);
+            }
+           
         }
 
         private void EnableControls(bool enableControls)
         {
             btnSet.Enabled = false;
             txtPlateCount.Enabled = false;
+        }
+
+        private void btnRefresh_Click(object sender, EventArgs e)
+        {
+            int selIndex = lstMP3Barcode.SelectedIndex;
+            if(selIndex == -1)
+            {
+                MessageBox.Show("请选中一个微孔板条码");
+                return;
+            }
+            var expectedBarcode = GlobalVars.Instance.eachPlateExpectedBarcodes[selIndex];
+            bool isEqual = (txtCurBarcode.Text == expectedBarcode);
+            string suffix = isEqual ? ":r" : ":e";
+            lstMP3Barcode.Items[selIndex] = txtCurBarcode.Text + suffix;
+            string hint = isEqual ? string.Format("第{0}个微孔板条码已经修复。", selIndex+1) : string.Format("微孔板条码仍然错误,期望条码：{0}！", expectedBarcode);
+            AddHintInfo(hint, isEqual ? Color.Green : Color.Red);
         }
     }
 }
