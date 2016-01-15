@@ -20,7 +20,7 @@ namespace Guarder
                                 .Last();
             string sFilePath = last.FullName;
             int plateCnt = GlobalVars.Instance.PlateCnt;
-            string csvFilePath = sFilePath.Replace(suffix, "csv");
+            string csvFilePath = sFilePath.Replace(suffix, ".csv");
             if (File.Exists(csvFilePath))
                 File.Delete(csvFilePath);
             SaveAsCSV(new List<string>() { sFilePath });
