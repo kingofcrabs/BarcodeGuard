@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 2013 for Windows Desktop
+# Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifier", "Notifier\Notifier.csproj", "{2382DD05-D966-491C-B125-BEDC0EB3258E}"
@@ -16,6 +16,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "testDuplicatedString", "testDuplicatedString\testDuplicatedString.csproj", "{3A907BF5-0AD4-48A0-A4E2-768667AC151D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimulatePosID", "SimulatePosID\SimulatePosID.csproj", "{DBBD1A86-7DEB-428E-A7FA-9221869A0D32}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GuarderBuffy", "GuarderBuffy\GuarderBuffy.csproj", "{15098EC2-ED53-4AB5-AAFE-A294A2DD6D42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +95,16 @@ Global
 		{DBBD1A86-7DEB-428E-A7FA-9221869A0D32}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{DBBD1A86-7DEB-428E-A7FA-9221869A0D32}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{DBBD1A86-7DEB-428E-A7FA-9221869A0D32}.Release|x86.ActiveCfg = Release|Any CPU
+		{15098EC2-ED53-4AB5-AAFE-A294A2DD6D42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{15098EC2-ED53-4AB5-AAFE-A294A2DD6D42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{15098EC2-ED53-4AB5-AAFE-A294A2DD6D42}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{15098EC2-ED53-4AB5-AAFE-A294A2DD6D42}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{15098EC2-ED53-4AB5-AAFE-A294A2DD6D42}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{15098EC2-ED53-4AB5-AAFE-A294A2DD6D42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{15098EC2-ED53-4AB5-AAFE-A294A2DD6D42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{15098EC2-ED53-4AB5-AAFE-A294A2DD6D42}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{15098EC2-ED53-4AB5-AAFE-A294A2DD6D42}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{15098EC2-ED53-4AB5-AAFE-A294A2DD6D42}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

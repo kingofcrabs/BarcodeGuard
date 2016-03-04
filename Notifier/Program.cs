@@ -23,10 +23,36 @@ namespace Notifier
             string s = "";
             if (args.Count() > 0)
                 s = args[0];
-            
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new MainForm(s));
+            SendCommand(s);
+           
+        }
+
+        static void SendCommand(string sContent)
+        {
+
+            string sProgramName = ConfigurationManager.AppSettings["dstProgramName"];
+            using (NamedPipeClientStream pipeClient = new NamedPipeClientStream(".", sProgramName,
+                                                                           PipeDirection.Out,
+                                                                        PipeOptions.None))
+            {
+
+                Console.WriteLine("Attempting to connect to pipe...\r\n");
+                try
+                {
+                    pipeClient.Connect(1000);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(string.Format("Cannot connect to server, reason: {0}.\r\n", ex.Message));
+                    return;
+                }
+                Console.WriteLine("Connected to pipe.\r\n");
+
+                using (StreamWriter sw = new StreamWriter(pipeClient))
+                {
+                    sw.Write(sContent);
+                }
+            }
         }
     }
 }

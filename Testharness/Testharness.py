@@ -1,5 +1,5 @@
-from subprocess import call
-sOutputFolder = "F:\\Projects\\BarcodeGuard\\trunk\\GuarderExcel\\bin\\Output\\"
+﻿from subprocess import call
+sOutputFolder = "F:\\Projects\\BarcodeGuard.git\\trunk\\GuarderBuffy\\bin\\Output\\"
 def ScanBarcode( grid):
     "scan barcode for certain grid"
     scanResult = True;
@@ -25,7 +25,7 @@ def main():
     f = open(sOutputFolder + "gridsCount.txt");
     gridNum = f.read();
     f.close();
-    startGrid = 5;
+    startGrid = 7;
     endGrid = startGrid + int(gridNum);
     for grid in range(startGrid,endGrid):
         ScanBarcode(grid);
