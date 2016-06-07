@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -21,6 +22,15 @@ namespace Guarder
         {
             InitializeComponent();
             txtDstSlice.Enabled = false;
+            
+            if(ConfigurationManager.AppSettings["transferSlice"] != null)
+            {
+                txtSlices.Text = ConfigurationManager.AppSettings["transferSlice"];
+            }
+            if (ConfigurationManager.AppSettings["productSlice"] != null)
+            {
+                txtDstSlice.Text = ConfigurationManager.AppSettings["productSlice"];
+            }
         }
 
         private void btnConfirm_Click(object sender, EventArgs e)

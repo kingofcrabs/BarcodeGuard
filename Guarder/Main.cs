@@ -678,6 +678,16 @@ namespace Guarder
             if (expectedBarcodes.Count == 0)
                 throw new Exception(string.Format("无法找到Grid:{0}期望的条码！", grid));
             bool bok = true;
+            var index = barcodes.IndexOf(dummy);
+            if( index != -1)
+            {
+                string tmpExpectedBarcode = "";
+                string tmpErrMsg = "";
+                bool isValid = IsValidDstBarcode(barcodes[index], grid, index, ref tmpExpectedBarcode, ref tmpErrMsg);
+                AddHintInfo("*** string found, look at its errMessage: " + tmpErrMsg, Color.DarkRed);
+            }
+
+
             for(int i = 0; i < expectedBarcodes.Count; i++)
             {
                 string expectedBarcode = "";
@@ -685,26 +695,27 @@ namespace Guarder
                 string tmpStr = isValid ? "" : errMsg;
                 errorsInfo.SampleDescriptionCollection.Add(new SampleDescription(i + 1, barcodes[i], expectedBarcode,tmpStr, isValid));
                 results.Add(isValid);
-                bok = bok & isValid;
+                if (!isValid)
+                    bok = false;
             }
             return bok;
         }
 
-        private bool IsValidDstBarcode(string curBarcode, int dstGrid, int colIndex,ref string expectedBarcode, ref string errMsg)
+        private bool IsValidDstBarcode(string curBarcode, int dstGrid, int rowIndex,ref string expectedBarcode, ref string errMsg)
         {
             expectedBarcode = dummy;
-            if (eachGridBarcodes.ContainsKey(dstGrid) && eachGridBarcodes[dstGrid].Count() > colIndex)
-                expectedBarcode = eachGridBarcodes[dstGrid][colIndex];
+            if (eachGridBarcodes.ContainsKey(dstGrid) && eachGridBarcodes[dstGrid].Count() > rowIndex)
+                expectedBarcode = eachGridBarcodes[dstGrid][rowIndex];
             if (expectedBarcode == dummy)
             {
-                errMsg = string.Format("Grid: {0}第{1}个条码无法找到其原始管条码！", dstGrid, colIndex + 1);
+                errMsg = string.Format("Grid: {0}第{1}个条码无法找到其原始管条码！", dstGrid, rowIndex + 1);
                 return false;
             }
             
             if (curBarcode != expectedBarcode)
             {
                 errMsg = string.Format("Grid: {0}第{1}个条码为{2},应该为{3}！",
-                    dstGrid, colIndex + 1, curBarcode, expectedBarcode);
+                    dstGrid, rowIndex + 1, curBarcode, expectedBarcode);
                 return false;
             }
             return true;
