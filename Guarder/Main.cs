@@ -413,11 +413,14 @@ namespace Guarder
             List<string> barcodes, 
             List<bool> bValidList)
         {
+            
             int dstSlices = packageInfo.dstSlices;
+            if (is2TransferTubes)
+                dstSlices = 2;
             int regionIndex = (srcGrid - GetSrcStartGrid()) / packageInfo.srcSlices;
             for( int sliceIndex = 0; sliceIndex < dstSlices; sliceIndex++)
             {
-                int dstGrid = GetDstStartGrid() + regionIndex * packageInfo.dstSlices + sliceIndex;
+                int dstGrid = GetDstStartGrid() + regionIndex * dstSlices + sliceIndex;
                 eachGridBarcodes[dstGrid] = CalculdateCorrespondingBarcodes(sliceIndex, barcodes, bValidList);
                 //UpdateThisGridExpectedBarcode(eachGridBarcodes[dstGrid],sliceIndex, barcodes, results);
             }
@@ -497,9 +500,9 @@ namespace Guarder
                 //AddErrorInfo(string.Format("条码设置错误{0}，请重新设置", srcBarcode));
                 return dummy;
             }
-            string year = (DateTime.Now.Year % 100).ToString();
+            //string year = (DateTime.Now.Year % 100).ToString();
             string s = srcBarcode;
-          
+            string year = s.Substring(0, 2);
             string sID = s.Substring(3, 7);
             string sExpectedBarcode = string.Format("{0}P{1}", year, sID);
             if (s.Contains("R"))
@@ -508,6 +511,8 @@ namespace Guarder
                 sExpectedBarcode += "D";
             string suffix = is2TransferTubes ? ((char)(sliceIndex + 'A')).ToString() : (sliceIndex + 1).ToString();
             sExpectedBarcode += "-" + suffix;
+            if (is2TransferTubes && sliceIndex == 1) //same as source
+                sExpectedBarcode = srcBarcode;
             return sExpectedBarcode;
         }
 
@@ -539,6 +544,7 @@ namespace Guarder
             string BorP = is2TransferTubes ? "B" : "P";
             string year = (DateTime.Now.Year % 100).ToString();
             string prefixStr = year + BorP;
+            string prefixStrLast = ((DateTime.Now.Year-1) % 100).ToString() + BorP;
 
             int expectedLen = 10;
             string sCurrentBarcode = barcodes[rowIndex];
@@ -612,11 +618,18 @@ namespace Guarder
                 return false;
             }
 
-            if (!sCurrentBarcode.StartsWith(prefixStr))
+            var tstPrefix = sCurrentBarcode.Substring(2);
+            if (!tstPrefix.StartsWith(prefixStr) && (!tstPrefix.StartsWith(prefixStrLast)))
             {
-                errMsg = string.Format("Grid{0}中第{1}个条码:{2}不符合规则！必须以‘{3}’开始",
+                errMsg = string.Format("Grid{0}中第{1}个条码:{2}不符合规则！必须以‘{3}’或‘{4}’开始",
                     grid,
-                    rowIndex + 1, sCurrentBarcode, prefixStr);
+                    rowIndex + 1, sCurrentBarcode, prefixStr,prefixStrLast);
+                return false;
+            }
+
+            if(!sCurrentBarcode.Contains(BorP))
+            {
+                errMsg = string.Format("Grid{0}中第{1}个条码:{2}不符合规则！必须以包含{3}", grid, rowIndex + 1,sCurrentBarcode, BorP);
                 return false;
             }
 

@@ -55,7 +55,7 @@
             this.label4.AutoSize = true;
             this.label4.Location = new System.Drawing.Point(12, 42);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(49, 13);
+            this.label4.Size = new System.Drawing.Size(55, 13);
             this.label4.TabIndex = 15;
             this.label4.Text = "样本数：";
             // 
@@ -64,7 +64,7 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(12, 202);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(37, 13);
+            this.label2.Size = new System.Drawing.Size(43, 13);
             this.label2.TabIndex = 18;
             this.label2.Text = "提示：";
             // 
@@ -116,14 +116,14 @@
             this.txtSlices.Name = "txtSlices";
             this.txtSlices.Size = new System.Drawing.Size(124, 20);
             this.txtSlices.TabIndex = 23;
-            this.txtSlices.Text = "2";
+            this.txtSlices.Text = "1";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 80);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(61, 13);
+            this.label1.Size = new System.Drawing.Size(67, 13);
             this.label1.TabIndex = 24;
             this.label1.Text = "中转份数：";
             // 
@@ -132,7 +132,7 @@
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(12, 118);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(61, 13);
+            this.label3.Size = new System.Drawing.Size(67, 13);
             this.label3.TabIndex = 25;
             this.label3.Text = "产物份数：";
             // 
@@ -142,7 +142,7 @@
             this.txtDstSlice.Name = "txtDstSlice";
             this.txtDstSlice.Size = new System.Drawing.Size(124, 20);
             this.txtDstSlice.TabIndex = 26;
-            this.txtDstSlice.Text = "5";
+            this.txtDstSlice.Text = "3";
             // 
             // SettingForm
             // 
