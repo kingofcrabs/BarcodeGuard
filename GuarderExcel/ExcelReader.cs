@@ -13,6 +13,19 @@ namespace Guarder
         const string suffix = ".xlsm";
         static public void ReadBarcodes()
         {
+            try
+            {
+                ReadBarcodesImpl();
+            }
+            catch(Exception ex)
+            {
+                throw new Exception("Excel格式错误，可能板子数量不够！");
+            }
+            
+        }
+
+        private static void ReadBarcodesImpl()
+        {
             string sFolder = GlobalVars.Instance.ExcelFolder;
             var di = new DirectoryInfo(sFolder);
             var last = di.EnumerateFiles("*" + suffix)
@@ -28,21 +41,22 @@ namespace Guarder
             GlobalVars.Instance.eachGridExpectedBarcodes.Clear();
             GlobalVars.Instance.eachPlateExpectedBarcodes.Clear();
             int curGrid = GlobalVars.Instance.StartGridID;
-            for(int i = 0; i< GlobalVars.Instance.PlateCnt; i++)
+            for (int i = 0; i < GlobalVars.Instance.PlateCnt; i++)
             {
-                int startLine = i * 10 + plateBarcodeStartLine -1;
+                int startLine = i * 10 + plateBarcodeStartLine - 1;
+
                 string barcodeLine = lines[startLine];
                 string barcode = ParsePlateBarcode(barcodeLine);
                 GlobalVars.Instance.eachPlateExpectedBarcodes.Add(barcode);
                 GlobalVars.Instance.PlateBarcodes.Add(barcode);
                 List<string> thisPlateBarcodes = ParseWellBarcodes(lines, startLine);
-                while(thisPlateBarcodes.Count > 0)
+                while (thisPlateBarcodes.Count > 0)
                 {
                     var thisGridBarcodes = thisPlateBarcodes.Take(16).ToList();
                     GlobalVars.Instance.eachGridExpectedBarcodes.Add(curGrid++, thisGridBarcodes);
                     thisPlateBarcodes = thisPlateBarcodes.Skip(thisGridBarcodes.Count).ToList();
                 }
-                
+
             }
         }
 
