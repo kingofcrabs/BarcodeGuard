@@ -25,7 +25,8 @@ namespace TestHelper
         }
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            string sFolder = GetExeFolder();
+            //string sFolder = GetExeFolder();
+            string sFolder = @"C:\ProgramData\Tecan\EVOware\output\";
             var files = Directory.EnumerateFiles(sFolder, "*.csv");
             List<string> lstFileStr = new List<string>(files);
             files = lstFileStr.OrderBy(x => GetNumber(x));
@@ -44,7 +45,7 @@ namespace TestHelper
             if (lstFiles.SelectedIndex == -1)
                 return;
             string file = (string)lstFiles.SelectedItem;
-            File.Copy(file,@"c:\biobanking\scan.csv",true);
+            File.Copy(file, @"C:\ProgramData\Tecan\EVOware\output\scan.csv", true);
             string sFolder = GetExeFolder();
             string sNotifier = sFolder + "";
             Process.Start("Notifier.exe", "gg").WaitForExit();

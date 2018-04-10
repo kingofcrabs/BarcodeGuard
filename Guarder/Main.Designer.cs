@@ -41,8 +41,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.lblVersion = new System.Windows.Forms.Label();
-            this.rdbResult = new System.Windows.Forms.RadioButton();
-            this.rdb2Transfer = new System.Windows.Forms.RadioButton();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtTemplate = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -162,37 +162,30 @@
             this.lblVersion.Size = new System.Drawing.Size(0, 13);
             this.lblVersion.TabIndex = 15;
             // 
-            // rdbResult
+            // label5
             // 
-            this.rdbResult.AutoSize = true;
-            this.rdbResult.Enabled = false;
-            this.rdbResult.Location = new System.Drawing.Point(305, 14);
-            this.rdbResult.Name = "rdbResult";
-            this.rdbResult.Size = new System.Drawing.Size(73, 17);
-            this.rdbResult.TabIndex = 24;
-            this.rdbResult.Text = "到产物管";
-            this.rdbResult.UseVisualStyleBackColor = true;
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(177, 16);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(49, 13);
+            this.label5.TabIndex = 16;
+            this.label5.Text = "模板名：";
             // 
-            // rdb2Transfer
+            // txtTemplate
             // 
-            this.rdb2Transfer.AutoSize = true;
-            this.rdb2Transfer.Checked = true;
-            this.rdb2Transfer.Enabled = false;
-            this.rdb2Transfer.Location = new System.Drawing.Point(196, 14);
-            this.rdb2Transfer.Name = "rdb2Transfer";
-            this.rdb2Transfer.Size = new System.Drawing.Size(73, 17);
-            this.rdb2Transfer.TabIndex = 23;
-            this.rdb2Transfer.TabStop = true;
-            this.rdb2Transfer.Text = "到中转管";
-            this.rdb2Transfer.UseVisualStyleBackColor = true;
+            this.txtTemplate.Location = new System.Drawing.Point(232, 13);
+            this.txtTemplate.Name = "txtTemplate";
+            this.txtTemplate.ReadOnly = true;
+            this.txtTemplate.Size = new System.Drawing.Size(325, 20);
+            this.txtTemplate.TabIndex = 17;
             // 
             // GuardForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1162, 728);
-            this.Controls.Add(this.rdbResult);
-            this.Controls.Add(this.rdb2Transfer);
+            this.Controls.Add(this.txtTemplate);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.lblVersion);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.txtSampleCount);
@@ -228,8 +221,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label lblVersion;
-        private System.Windows.Forms.RadioButton rdbResult;
-        private System.Windows.Forms.RadioButton rdb2Transfer;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox txtTemplate;
     }
 }
 

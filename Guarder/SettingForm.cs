@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Configuration;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -14,23 +15,33 @@ namespace Guarder
     public partial class SettingForm : Form
     {
         public int smpCnt;
-        public bool b2Transfer = false;
-        public int plasmaSlices = -1;
-        public int productSlices = -1;
-
+        public string templateFile;
+        List<FileInfo> fileInfos = new List<FileInfo>();
         public SettingForm()
         {
             InitializeComponent();
-            txtDstSlice.Enabled = false;
+            this.Load += SettingForm_Load;
+        }
+
+        void SettingForm_Load(object sender, EventArgs e)
+        {
+            Helper.WriteResult(false);
+            string templateFolder = ConfigurationManager.AppSettings["TemplateFolder"];
+            List<string> files = Directory.EnumerateFiles(templateFolder, "*.csv").ToList();
+            foreach (var file in files)
+            {
+                var fileInfo = new FileInfo(file);
+                fileInfos.Add(fileInfo);
+                lstTemplates.Items.Add(fileInfo.Name.Replace(".csv", ""));
+            }
+            if(lstTemplates.Items.Count == 0)
+            {
+                SetErrorInfo("找不到比对模板！");
+                btnConfirm.Enabled = false;
+                return;
+            }
+            lstTemplates.SelectedIndex = 0;
             
-            if(ConfigurationManager.AppSettings["transferSlice"] != null)
-            {
-                txtSlices.Text = ConfigurationManager.AppSettings["transferSlice"];
-            }
-            if (ConfigurationManager.AppSettings["productSlice"] != null)
-            {
-                txtDstSlice.Text = ConfigurationManager.AppSettings["productSlice"];
-            }
         }
 
         private void btnConfirm_Click(object sender, EventArgs e)
@@ -55,36 +66,22 @@ namespace Guarder
                 SetErrorInfo("样本数必须在1~200之间！");
                 return;
             }
-           
-
-            bInt = int.TryParse(txtSlices.Text, out plasmaSlices);
-            if (!bInt)
+            if(lstTemplates.SelectedIndex == -1)
             {
-                SetErrorInfo("中转份数必须为数字！");
+                SetErrorInfo("请选中一个模板！");
                 return;
             }
-            if(plasmaSlices <1 || plasmaSlices > 6)
+            templateFile = fileInfos[lstTemplates.SelectedIndex].FullName;
+
+            TemplateReader templateReader = new TemplateReader();
+            List<int> srcGrids = new List<int>();
+            Dictionary<int, CheckInfo> eachGridCheckInfo = new Dictionary<int, CheckInfo>();
+            templateReader.GetCheckInfos(templateFile, ref srcGrids, ref eachGridCheckInfo);
+            if (smpCnt > srcGrids.Count * 16)
             {
-                SetErrorInfo("中转份数必须在1~6之间！");
+                SetErrorInfo(string.Format("共有{0}条src，最大允许样品：{1}", srcGrids.Count, srcGrids.Count * 16));
                 return;
             }
-
-
-            bInt = int.TryParse(txtDstSlice.Text, out productSlices);
-            if (!bInt)
-            {
-                SetErrorInfo("产物份数必须为数字！");
-                return;
-            }
-            if (productSlices < 1)
-            {
-                SetErrorInfo("产物份数必须在大于1！");
-                return;
-            }
-
-            
-            b2Transfer = rdb2Transfer.Checked;
-            
             this.Close();
         }
 
@@ -95,10 +92,6 @@ namespace Guarder
             txtInfo.BackColor = Color.White;
         }
 
-        private void rdb2Transfer_CheckedChanged(object sender, EventArgs e)
-        {
-            txtDstSlice.Enabled = !rdb2Transfer.Checked;
-        }
-
+     
     }
 }

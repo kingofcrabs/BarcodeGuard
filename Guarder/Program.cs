@@ -18,7 +18,7 @@ namespace Guarder
             Application.SetCompatibleTextRenderingDefault(false);
             SettingForm settingForm = new SettingForm();
             settingForm.ShowDialog();
-            Application.Run(new GuardForm(settingForm.smpCnt,settingForm.b2Transfer,settingForm.plasmaSlices,settingForm.productSlices));
+            Application.Run(new GuardForm(settingForm.smpCnt, settingForm.templateFile));
         }
     }
 }

@@ -31,27 +31,61 @@ namespace SimulatePosID
             }
             else
             {
-                if (gridNum != "8")
+                List<string> testbarcodes = new List<string>(){
+                    "17B4441028",
+                    "17B4441029",
+                    "17B4441030",
+                    "17B4441031",
+                    "17B4441032",
+                    "17B4441033",
+                    "17B4441034",
+                    "17B4441035",
+                    "17B4441036",
+                    "17B4441037",
+                    "17B4441038",
+                    "17B4441039",
+                    "17B4441040",
+                    "17B4441041",
+                    "17B4441042",
+                    "17B4438293"
+                };
+
+                List<string> test2barcodes = new List<string>(){
+                    "17B4441028-A",
+                    "17B4441029-A",
+                    "17B4441030-A",
+                    "17B4441031-A",
+                    "17B4441032-A",
+                    "17B4441033-A",
+                    "17B4441034-A",
+                    "17B4441035-A",
+                    "17B4441036-A",
+                    "17B4441037-A",
+                    "17B4441038-A",
+                    "17B4441039-A",
+                    "17B4441040-A",
+                    "17B4441041-A",
+                    "17B4441042-A",
+                    "17B4438293-A"
+                };
+
+
+
+                if (gridNum == "14")
                 {
                     for (int i = 0; i < 16; i++)
                     {
                         string sBarcode = string.Format("{0}_{1:D3}", gridNum, i + 1);
-                        string sLine = string.Format("{0};1;{1};Tube Eppendorf 16 Pos;Labware4;968/002718;{2}", gridNum, i + 1, sBarcode);
+                        string sLine = string.Format("{0};1;{1};Tube Eppendorf 16 Pos;Labware4;968/002718;{2}", gridNum, i + 1, testbarcodes[i]);
                         strs.Add(sLine);
                     }
                 }
                 else
                 {
-                    for (int i = 0; i < 13; i++)
+                    for (int i = 0; i < 16; i++)
                     {
                         string sBarcode = string.Format("{0}_{1:D3}", gridNum, i + 1);
-                        string sLine = string.Format("{0};1;{1};Tube Eppendorf 16 Pos;Labware4;968/002718;{2}", gridNum, i + 1, sBarcode);
-                        strs.Add(sLine);
-                    }
-                    for (int i = 0; i < 3; i++)
-                    {
-                        //string sBarcode = string.Format("{0}_{1:D3}", gridNum, i + 1);
-                        string sLine = string.Format("{0};1;{1};Tube Eppendorf 16 Pos;Labware4;968/002718;{2}", gridNum, i + 1, "$$$");
+                        string sLine = string.Format("{0};1;{1};Tube Eppendorf 16 Pos;Labware4;968/002718;{2}", gridNum, i + 1, test2barcodes[i]);
                         strs.Add(sLine);
                     }
                 }

@@ -16,33 +16,22 @@ namespace Guarder
 {
     public partial class GuardForm : Form
     {
-        FirstRoundPackageInfo firstRoundLayoutInfo = new FirstRoundPackageInfo();
-        SecondRoundPackageInfo secondRoundLayoutInfo = new SecondRoundPackageInfo();
-        PackageInfo packageInfo = new PackageInfo();
         int sampleCount = 0;
-        bool is2TransferTubes = false;
         bool programModify = false;
         List<int> srcGrids = new List<int>();
         Dictionary<int, List<string>> eachGridBarcodes = new Dictionary<int, List<string>>();
-        //Dictionary<int, List<string>> eachSrcGridRefBarcodes = new Dictionary<int, List<string>>();
+        Dictionary<int, CheckInfo> eachGridCheckInfo = new Dictionary<int, CheckInfo>();
         ErrorsInfo errorsInfo = new ErrorsInfo();
         string dummy = "***";
-        public GuardForm(int sampleCnt, bool is2Transfer,int plasmaSlices, int productSlices)
+        public GuardForm(int sampleCnt,string templateFile)
         {
             InitializeComponent();
-            Helper.WriteResult(false);
-            this.is2TransferTubes = is2Transfer;
             lblVersion.Text = strings.version;
             sampleCount = sampleCnt;
-            try
-            {
-                GetSettings(plasmaSlices,productSlices);
-            }
-            catch (Exception ex)
-            {
-                AddErrorInfo(ex.Message);
-                return;
-            }
+            TemplateReader templateReader = new TemplateReader();
+            templateReader.GetCheckInfos(templateFile, ref srcGrids, ref eachGridCheckInfo);
+            txtTemplate.Text = templateFile;
+            
             this.Load += Main_Load;
             this.FormClosing += GuardForm_FormClosing;
             this.FormClosed += GuardForm_FormClosed;
@@ -128,37 +117,13 @@ namespace Guarder
         void Main_Load(object sender, EventArgs e)
         {
             txtSampleCount.Text = sampleCount.ToString();
-            rdb2Transfer.Checked = is2TransferTubes;
-            rdbResult.Checked = !is2TransferTubes;
+         
             CreateNamedPipeServer();
             UpdateDataGridView();
+            
         }
 
-        private void GetSettings(int plasmaSlice,int productSlices)
-        {
-            string sFolder = ConfigurationManager.AppSettings["biobankingFolder"];
-            if (!Directory.Exists(sFolder))
-                throw new Exception("biobanking 文件夹找不到！");
-            PipettingSettings pipettingSettings = null;
-            LabwareSettings labwareSettings = null;
-        
-            Helper.LoadSettings(sFolder, ref pipettingSettings, ref labwareSettings);
-            pipettingSettings.dstPlasmaSlice = plasmaSlice;
-
-            if(is2TransferTubes)
-            {
-                firstRoundLayoutInfo.slices = pipettingSettings.dstPlasmaSlice;
-                firstRoundLayoutInfo.srcStartGrid = labwareSettings.sourceLabwareStartGrid;
-                firstRoundLayoutInfo.dstStartGrid = labwareSettings.dstLabwareStartGrid;
-            }
-            else
-            {
-                secondRoundLayoutInfo.srcSlices = pipettingSettings.dstPlasmaSlice;
-                secondRoundLayoutInfo.dstSlices = productSlices;
-                secondRoundLayoutInfo.srcStartGrid = int.Parse(ConfigurationManager.AppSettings["secondRoundSrcStartGrid"]);
-                secondRoundLayoutInfo.dstStartGrid = int.Parse(ConfigurationManager.AppSettings["secondRoundDstStartGrid"]);
-            }
-        }
+    
 
         private void AddErrorInfo(string txt)
         {
@@ -178,39 +143,42 @@ namespace Guarder
             dataGridView.EnableHeadersVisualStyles = false;
             dataGridView.Columns.Clear();
             List<string> strs = new List<string>();
-
-            GetPackageInfo();
-          
-            for (int j = 0; j < packageInfo.totalColNum; j++)
-                strs.Add("");
-            
-            int srcStartGrid = GetSrcStartGrid();
-            ////src samples
-            TubeType tubeType = is2TransferTubes ? TubeType.source : TubeType.transfter;
-
-            for (int i = 0; i < packageInfo.srcSampleColNum; i++)
+            int neededSrcGrids = (sampleCount + 15) / 16;
+            int colIndex = 0;
+            List<int> dstGrids = new List<int>();
+            srcGrids = srcGrids.Take(neededSrcGrids).ToList();
+            Dictionary<int,int> dstGridID_SrcID = new Dictionary<int,int>();
+            foreach (var gridID in srcGrids)
             {
                 DataGridViewTextBoxColumn column = new DataGridViewTextBoxColumn();
-                column.HeaderText = string.Format("条{0}src", srcStartGrid + i);
-                srcGrids.Add(srcStartGrid + i);
+                column.HeaderText = string.Format("条{0}src", gridID);
+                var correspondingDsts = eachGridCheckInfo.Where(x=>x.Value.srcGrid == gridID && !x.Value.isSrc).Select(x=>x.Key).ToList();
+                correspondingDsts.ForEach(x=>dstGridID_SrcID.Add(x,gridID));
+                dstGrids.AddRange(correspondingDsts);
                 column.HeaderCell.Style.BackColor = Color.LightSeaGreen;
                 dataGridView.Columns.Add(column);
-                dataGridView.Columns[i].SortMode = DataGridViewColumnSortMode.Programmatic;
-                eachGridBarcodes.Add(srcStartGrid + i,new List<string>() );
+                dataGridView.Columns[colIndex++].SortMode = DataGridViewColumnSortMode.Programmatic;
+                eachGridBarcodes.Add(gridID,new List<string>() );
+                if (colIndex == neededSrcGrids)
+                    break;
             }
-
-            tubeType = is2TransferTubes ? TubeType.transfter : TubeType.dst;
-            int dstStartGrid = GetDstStartGrid();
-            for (int i = 0; i < packageInfo.dstColNum; i++)
+            foreach(var dstGrid in dstGrids)
             {
                 DataGridViewTextBoxColumn column = new DataGridViewTextBoxColumn();
-                column.HeaderText = string.Format("条{0}dst", dstStartGrid + i);
+                column.HeaderText = string.Format("条{0}dst[条{1}src]", dstGrid, dstGridID_SrcID[dstGrid]);
                 column.HeaderCell.Style.BackColor = Color.LightBlue;
                 dataGridView.Columns.Add(column);
-                dataGridView.Columns[i].SortMode = DataGridViewColumnSortMode.Programmatic;
-                eachGridBarcodes.Add(dstStartGrid + i,new List<string>());
+                eachGridBarcodes.Add(dstGrid, new List<string>());
             }
 
+            int totalColNum = dstGrids.Count + srcGrids.Count;
+            for (int j = 0; j < totalColNum; j++)
+                strs.Add("");
+            int totalColumns = dstGrids.Count + srcGrids.Count;
+            for (int i = 0; i < totalColumns; i++)
+            {
+                dataGridView.Columns[i].SortMode = DataGridViewColumnSortMode.Programmatic;
+            }
             dataGridView.RowHeadersWidth = 80;
             for (int i = 0; i < 16; i++)
             {
@@ -218,8 +186,6 @@ namespace Guarder
                 dataGridView.Rows[i].HeaderCell.Value = string.Format("行{0}", i + 1);
             }
             ExportScanGrids(eachGridBarcodes.Keys.Select(x => x.ToString()).ToList());
-            //string grids2Scan = Helper.GetExeFolder() + "grids.txt";
-            //File.WriteAllLines(grids2Scan,eachGridBarcodes.Keys.Select(x=>x.ToString()).ToArray());
         }
 
         private void ExportScanGrids(List<string> list)
@@ -239,61 +205,7 @@ namespace Guarder
             Helper.CloseWaiter(strings.NotifierName);
         }
 
-        private void GetPackageInfo()
-        {
-            packageInfo.srcSampleColNum = (int)Math.Ceiling(sampleCount / 16.0);
-            packageInfo.srcSlices = is2TransferTubes ? 1 : secondRoundLayoutInfo.srcSlices;
-            packageInfo.dstSlices = is2TransferTubes ? firstRoundLayoutInfo.slices : secondRoundLayoutInfo.dstSlices;
-            packageInfo.totalColNum = packageInfo.srcSampleColNum * (packageInfo.srcSlices + packageInfo.dstSlices);
-            packageInfo.srcSampleColNum *= packageInfo.srcSlices;
-            packageInfo.dstColNum = packageInfo.totalColNum - packageInfo.srcSampleColNum;
-        }
-
-        //private List<string> CalculateBarcodes(int gridIndex, int slices, TubeType tubeType)
-        //{
-        //    int correspondingSrcSampleGridIndex = gridIndex / slices;
-            
-        //    List<string> barcodes = new List<string>();
-        //    string prefix = "";
-        //    string year = (DateTime.Now.Year % 100).ToString();
-        //    switch(tubeType)
-        //    {
-        //        case TubeType.source:
-        //            prefix = string.Format("{0}B", year);
-        //            break;
-        //        case TubeType.transfter:
-        //            prefix = string.Format("{0}T", year);
-        //            break;
-        //        case TubeType.dst:
-        //            prefix = string.Format("{0}P", year);
-        //            break;
-        //    }
-            
-        //    //int gridStartID = correspondingSrcSampleGridIndex * 16 + firstID;
-        //    //string gridSliceDesc = "";
-        //    //if (tubeType != TubeType.source)
-        //    //{
-        //    //    gridSliceDesc = string.Format("-{0}", gridIndex % slices + 1);
-        //    //}
-        //    //int remainingSrcSamples = sampleCount - correspondingSrcSampleGridIndex * 16;
-        //    //remainingSrcSamples = Math.Min(remainingSrcSamples, 16);
-        //    //string suffix = isRedo ? "R" : "";
-        //    //for( int i = 0; i< remainingSrcSamples;i++)
-        //    //{
-        //    //    barcodes.Add(prefix + string.Format("{0:D7}", gridStartID + i) + gridSliceDesc + suffix);
-        //    //}
-        //    return barcodes;
-        //}
-
-        private int GetDstStartGrid()
-        {
-            return is2TransferTubes ? firstRoundLayoutInfo.dstStartGrid : secondRoundLayoutInfo.dstStartGrid;
-        }
-
-        private int GetSrcStartGrid()
-        {
-            return is2TransferTubes ? firstRoundLayoutInfo.srcStartGrid : secondRoundLayoutInfo.srcStartGrid;
-        }
+     
 
 
         private void btnClear_Click(object sender, EventArgs e)
@@ -377,9 +289,7 @@ namespace Guarder
             {
                 //if (!is2TransferTubes) //ref barcode only works with from transfer to dst
                 //    eachSrcGridRefBarcodes[grid] = barcodes;
-                SaveBarcodeThisGrid(grid,barcodes);
-                int indexInRegion = (grid - GetSrcStartGrid()) % packageInfo.srcSlices;
-                if (indexInRegion == 0) //first slice
+                if(srcGrids.Contains(grid))
                     UpdateAllDstExpectedBarcodes(grid,barcodes, results);
             }
             UpdateGridCells(grid, barcodes, results);
@@ -413,34 +323,34 @@ namespace Guarder
             List<string> barcodes, 
             List<bool> bValidList)
         {
-            
-            int dstSlices = packageInfo.dstSlices;
-            if (is2TransferTubes)
-                dstSlices = 2;
-            int regionIndex = (srcGrid - GetSrcStartGrid()) / packageInfo.srcSlices;
-            for( int sliceIndex = 0; sliceIndex < dstSlices; sliceIndex++)
+            List<CheckInfo> sameSrcGridCheckInfos = new List<CheckInfo>();
+            foreach(var thisGridCheckInfo in eachGridCheckInfo)
             {
-                int dstGrid = GetDstStartGrid() + regionIndex * dstSlices + sliceIndex;
-                eachGridBarcodes[dstGrid] = CalculdateCorrespondingBarcodes(sliceIndex, barcodes, bValidList);
-                //UpdateThisGridExpectedBarcode(eachGridBarcodes[dstGrid],sliceIndex, barcodes, results);
+                if (thisGridCheckInfo.Value.isSrc)
+                    continue;
+                CheckInfo checkInfo = thisGridCheckInfo.Value;
+                if(checkInfo.srcGrid == srcGrid)
+                {
+                    sameSrcGridCheckInfos.Add(checkInfo);
+                }
+            }
+
+            foreach(var checkInfo in sameSrcGridCheckInfos)
+            {
+                int dstGrid = checkInfo.dstGrid;
+                eachGridBarcodes[dstGrid] = CalculdateCorrespondingBarcodes(checkInfo, barcodes, bValidList);
             }
         }
 
-        private void UpdateCertianDstExpectedBarcode(string barcode,int colIndex, int rowIndex)
+        private void UpdateCertianDstExpectedBarcode(string barcode,int srcGrid, int rowIndex)
         {
-            int slices = packageInfo.dstSlices;
-            //int regionIndex = colIndex / packageInfo.srcSlices;
-            int curRegion = colIndex / packageInfo.srcSlices;
-            int indexInRegion = colIndex % packageInfo.srcSlices;
-            if (indexInRegion != 0)
-                return;
-            for (int sliceIndex = 0; sliceIndex < slices; sliceIndex++)
+            foreach(var checkInfo in eachGridCheckInfo.Values)
             {
-                int dstGrid = GetDstStartGrid() + curRegion * packageInfo.dstSlices + sliceIndex;
-                if (!eachGridBarcodes.ContainsKey(dstGrid))
-                    continue;
-                eachGridBarcodes[dstGrid][rowIndex] = CalculdateCorrespondingBarcode(barcode, true, sliceIndex);
-                AddHintInfo(string.Format("刷新行{0}条{1}处的期望条码成{2}", rowIndex + 1, dstGrid, barcode), System.Drawing.Color.Blue);
+                if(checkInfo.srcGrid == srcGrid)
+                {
+                    eachGridBarcodes[checkInfo.dstGrid][rowIndex] = CalculdateCorrespondingBarcode(checkInfo, barcode, true);
+                }
+                AddHintInfo(string.Format("刷新行{0}条{1}处的期望条码成{2}", rowIndex + 1, checkInfo.dstGrid, barcode), System.Drawing.Color.Blue);
             }
         }
 
@@ -482,38 +392,47 @@ namespace Guarder
             programModify = false;
         }
 
-        private List<string> CalculdateCorrespondingBarcodes(int sliceIndex, List<string> barcodes,List<bool> bValidList)
+        private List<string> CalculdateCorrespondingBarcodes(CheckInfo checkInfo, List<string> barcodes,List<bool> bValidList)
         {
             List<string> correspondingBarcodes = new List<string>();
             
             for (int i = 0; i < barcodes.Count; i++ )
             {
-                correspondingBarcodes.Add(CalculdateCorrespondingBarcode(barcodes[i], bValidList[i], sliceIndex));
+                correspondingBarcodes.Add(CalculdateCorrespondingBarcode(checkInfo,barcodes[i], bValidList[i]));
             }
             return correspondingBarcodes;
         }
 
-        private string CalculdateCorrespondingBarcode(string srcBarcode, bool bValid, int sliceIndex)
+        private string CalculdateCorrespondingBarcode(CheckInfo checkInfo,string srcBarcode, bool bValid)
         {
             if (!bValid)
             {
-                //AddErrorInfo(string.Format("条码设置错误{0}，请重新设置", srcBarcode));
                 return dummy;
             }
-            //string year = (DateTime.Now.Year % 100).ToString();
             string s = srcBarcode;
             string year = s.Substring(0, 2);
-            string sID = s.Substring(3, 7);
-            string sExpectedBarcode = string.Format("{0}P{1}", year, sID);
-            if (s.Contains("R"))
-                sExpectedBarcode += "R";
-            if (s.Contains("D"))
-                sExpectedBarcode += "D";
-            string suffix = is2TransferTubes ? ((char)(sliceIndex + 'A')).ToString() : (sliceIndex + 1).ToString();
-            sExpectedBarcode += "-" + suffix;
-            if (is2TransferTubes && sliceIndex == 1) //same as source
-                sExpectedBarcode = srcBarcode;
+            string sID = GetCompactBarcode(s,checkInfo); //can be changed later
+            string bOrP = GetBOrP(checkInfo);
+            string sExpectedBarcode = string.Format("{0}{1}{2}", year,bOrP, sID);
+            sExpectedBarcode += checkInfo.suffix;
             return sExpectedBarcode;
+        }
+
+        private string GetCompactBarcode(string s, CheckInfo checkInfo)
+        {
+            string sID = s.Substring(3);
+            if(checkInfo.suffix != "")
+                sID = sID.Replace(checkInfo.suffix, "");
+            return sID;
+        }
+
+        private string GetBOrP(CheckInfo checkInfo)
+        {
+            if (checkInfo.BorPDesc == BorPDesc.Nothing)
+                return "";
+            if (checkInfo.BorPDesc == BorPDesc.Blood)
+                return "B";
+            return "P";
         }
 
         private bool CheckSourceSampleBarcodes(int grid,
@@ -523,7 +442,8 @@ namespace Guarder
         {
             
             bool bok = true;
-            int correspondingSrcSampleGridIndex = (grid- GetSrcStartGrid()) / packageInfo.srcSlices;
+            int correspondingSrcSampleGridIndex = FindGridIndex(grid); // (grid - GetSrcStartGrid()) / packageInfo.srcSlices;
+            
             int remainingSrcSamples = sampleCount - correspondingSrcSampleGridIndex * 16;
             int thisGridSample = Math.Min(remainingSrcSamples, 16);
              
@@ -538,10 +458,26 @@ namespace Guarder
             return bok;
         }
 
+        private int FindGridIndex(int grid)
+        {
+            for(int i = 0; i< srcGrids.Count; i++)
+            {
+                if (srcGrids[i] == grid)
+                    return i;
+            }
+            throw new Exception(string.Format("找不到Grid{0}!", grid));
+        }
+
         private bool IsValidSrcBarcode(int grid,int rowIndex, List<string> barcodes, ref string errMsg, bool isFromUI = false)
         {
+            CheckInfo checkInfo = eachGridCheckInfo.Where(x => x.Value.srcGrid == grid && x.Value.isSrc).First().Value;
             //B or P
-            string BorP = is2TransferTubes ? "B" : "P";
+            string BorP = "";
+            if (checkInfo.BorPDesc == BorPDesc.Blood)
+                BorP = "B";
+            else if (checkInfo.BorPDesc == BorPDesc.Plasma)
+                BorP = "P";
+            
             string year = (DateTime.Now.Year % 100).ToString();
             string prefixStr = year + BorP;
             string prefixStrLast = ((DateTime.Now.Year-1) % 100).ToString() + BorP;
@@ -553,25 +489,6 @@ namespace Guarder
             if (sCurrentBarcode.Contains('R') || sCurrentBarcode.Contains('D'))
                 expectedLen += 1;
 
-            int indexInRegion = (grid - GetSrcStartGrid()) % packageInfo.srcSlices;
-            if (indexInRegion != 0) //not first in region
-            {
-                if (eachGridBarcodes.ContainsKey(grid - indexInRegion))//compare to the first in the region
-                {
-                    string firstInRegionBarcode = eachGridBarcodes[grid - indexInRegion][rowIndex];
-                    firstInRegionBarcode = firstInRegionBarcode.Substring(0, firstInRegionBarcode.Length - 1);
-                    string removeLastCurrentBarcode = sCurrentBarcode.Substring(0, sCurrentBarcode.Length - 1);
-                    if (firstInRegionBarcode != removeLastCurrentBarcode)
-                    {
-                        errMsg = string.Format("Grid{0}中第{1}个条码:{2}与Grid{3}中的同行的条码不匹配！",
-                        grid,
-                        rowIndex + 1,
-                        sCurrentBarcode,
-                        grid - indexInRegion);
-                        return false;
-                    }
-                }
-            }
 
             if(isFromUI) //check all barcodes
             {
@@ -589,8 +506,6 @@ namespace Guarder
                 }
 
             }
-            
-
 
             List<string> aheadBarcodes = barcodes.Take(rowIndex).ToList();
             foreach(var pair in eachGridBarcodes)
@@ -618,20 +533,15 @@ namespace Guarder
                 return false;
             }
 
-            var tstPrefix = sCurrentBarcode.Substring(2);
-            if (!tstPrefix.StartsWith(prefixStr) && (!tstPrefix.StartsWith(prefixStrLast)))
+            //var tstPrefix = sCurrentBarcode.Substring(2);
+            if (!sCurrentBarcode.StartsWith(prefixStr) && (!sCurrentBarcode.StartsWith(prefixStrLast)))
             {
                 errMsg = string.Format("Grid{0}中第{1}个条码:{2}不符合规则！必须以‘{3}’或‘{4}’开始",
                     grid,
                     rowIndex + 1, sCurrentBarcode, prefixStr,prefixStrLast);
                 return false;
             }
-
-            if(!sCurrentBarcode.Contains(BorP))
-            {
-                errMsg = string.Format("Grid{0}中第{1}个条码:{2}不符合规则！必须以包含{3}", grid, rowIndex + 1,sCurrentBarcode, BorP);
-                return false;
-            }
+          
 
             if (sCurrentBarcode.Length != expectedLen)
             {
@@ -647,18 +557,18 @@ namespace Guarder
                 return false;
             }
 
-            char expectedSuffix = (char)('A' + indexInRegion);
-            if(sCurrentBarcode.Contains('P'))
-            {
-                char last = sCurrentBarcode.Last();
+            //char expectedSuffix = (char)('A' + indexInRegion);
+            //if(sCurrentBarcode.Contains('P'))
+            //{
+            //    char last = sCurrentBarcode.Last();
                
-                if(last != expectedSuffix)
-                {
-                    errMsg = string.Format("Grid{0}中第{1}个样品为中转管，但是其条码{2}不以{3}结尾!",
-                   grid, rowIndex + 1, sCurrentBarcode,expectedSuffix);
-                    return false;
-                }
-            }
+            //    if(last != expectedSuffix)
+            //    {
+            //        errMsg = string.Format("Grid{0}中第{1}个样品为中转管，但是其条码{2}不以{3}结尾!",
+            //       grid, rowIndex + 1, sCurrentBarcode,expectedSuffix);
+            //        return false;
+            //    }
+            //}
             
             string sub = sCurrentBarcode.Substring(3, 7);
             int digitalCount = sub.Count(x => Char.IsDigit(x));
@@ -829,7 +739,7 @@ namespace Guarder
                     , grid, e.RowIndex + 1);
                 if (isSourceGrid)
                 {
-                    UpdateCertianDstExpectedBarcode(actual,cell.ColumnIndex, cell.RowIndex);
+                    UpdateCertianDstExpectedBarcode(actual, grid, cell.RowIndex);
                 }
                 SaveBarcodeThisCell(actual, cell.RowIndex, eachGridBarcodes[grid]);
                 AddHintInfo(hint, Color.Orange);

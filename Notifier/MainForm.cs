@@ -14,11 +14,22 @@ namespace Notifier
 {
     public partial class MainForm : Form
     {
+        bool needClose = false;
         public MainForm(string s)
         {
             InitializeComponent();
             SendCommand(s);
+            needClose = s.ToLower() == "shutdown";
+            this.Load += MainForm_Load;
         }
+
+        void MainForm_Load(object sender, EventArgs e)
+        {
+            if (needClose)
+                this.Close();
+        }
+
+    
 
         private void SendCommand(string sContent)
         {
