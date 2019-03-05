@@ -289,6 +289,7 @@ namespace Guarder
             {
                 //if (!is2TransferTubes) //ref barcode only works with from transfer to dst
                 //    eachSrcGridRefBarcodes[grid] = barcodes;
+				SaveBarcodeThisGrid(grid,barcodes);
                 if(srcGrids.Contains(grid))
                     UpdateAllDstExpectedBarcodes(grid,barcodes, results);
             }
@@ -430,6 +431,8 @@ namespace Guarder
         {
             if (checkInfo.BorPDesc == BorPDesc.Nothing)
                 return "";
+            if (checkInfo.BorPDesc == BorPDesc.BloodOrPlasma)
+                return "BP";
             if (checkInfo.BorPDesc == BorPDesc.Blood)
                 return "B";
             return "P";
@@ -481,6 +484,20 @@ namespace Guarder
             string year = (DateTime.Now.Year % 100).ToString();
             string prefixStr = year + BorP;
             string prefixStrLast = ((DateTime.Now.Year-1) % 100).ToString() + BorP;
+            string suffix = checkInfo.suffix;
+
+            for (int i = 0; i < barcodes.Count; i++)
+            {
+                
+                if(!barcodes[i].Contains(suffix))
+                {
+                    errMsg = string.Format("Grid{0}中第{1}个条码:{2}不含有后缀:{3}！",
+                        grid,
+                        rowIndex + 1, barcodes[i],suffix);
+                    return false;
+                }
+            }
+
 
             int expectedLen = 10;
             string sCurrentBarcode = barcodes[rowIndex];
@@ -570,15 +587,15 @@ namespace Guarder
             //    }
             //}
             
-            string sub = sCurrentBarcode.Substring(3, 7);
-            int digitalCount = sub.Count(x => Char.IsDigit(x));
-            if (digitalCount != 7)
-            {
-                errMsg = string.Format("Grid{0}中第{0}个条码:{1}不符合规则，没有7位ID！",
-                    grid,
-                    rowIndex + 1, sCurrentBarcode);
-                return false;
-            }
+            //string sub = sCurrentBarcode.Substring(3, 7);
+            //int digitalCount = sub.Count(x => Char.IsDigit(x));
+            //if (digitalCount != 7)
+            //{
+            //    errMsg = string.Format("Grid{0}中第{0}个条码:{1}不符合规则，没有7位ID！",
+            //        grid,
+            //        rowIndex + 1, sCurrentBarcode);
+            //    return false;
+            //}
 
             //int regionIndex = (grid - GetSrcStartGrid()) / packageInfo.srcSlices;
             //int refGrid = GetSrcStartGrid() + regionIndex * packageInfo.srcSlices;
@@ -643,8 +660,6 @@ namespace Guarder
             }
             return true;
         }
-
-      
 
        
         private void UpdateGridCell(int gridID, int i, string expectedBarcode, string actualBarcode)

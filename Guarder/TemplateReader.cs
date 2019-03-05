@@ -11,7 +11,6 @@ namespace Guarder
 
         HashSet<string> foundBarcodes = new HashSet<string>();
         Dictionary<string, CheckInfo> barcode_SrcGrid = new Dictionary<string, CheckInfo>();
-
         public void GetCheckInfos(string file, ref List<int> srcGrids, ref Dictionary<int, CheckInfo> eachGridCheckInfo)
         {
             HashSet<int> srcHashGrids = new HashSet<int>();
@@ -48,13 +47,16 @@ namespace Guarder
 
         private CheckInfo ParseStr(string s,int thisGridID)
         {
-            bool isSrcGrid = IsSrcGrid(s);
+            string srcStr = string.Format("grid{0}", thisGridID);
+            bool isSrcGrid = s.Contains(srcStr);
             s = s.ToLower();
             bool hasYearPrefix = s.Contains("yy");
             BorPDesc bOrPDesc = BorPDesc.Nothing;
-            if(s.Contains("b"))
+            if(s.Contains("bp"))
+                bOrPDesc = BorPDesc.BloodOrPlasma;
+            else if (s.Contains("b"))
                 bOrPDesc = BorPDesc.Blood;
-            if(s.Contains("p"))
+            else if(s.Contains("p"))
                 bOrPDesc = BorPDesc.Plasma;
             int dashPos = s.IndexOf("-");
             string suffix = "";
@@ -142,6 +144,7 @@ namespace Guarder
     {
         Blood,
         Plasma,
+        BloodOrPlasma,
         Nothing
     }
 
